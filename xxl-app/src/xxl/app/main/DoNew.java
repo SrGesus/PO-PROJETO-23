@@ -12,11 +12,18 @@ class DoNew extends Command<Calculator> {
 
     DoNew(Calculator receiver) {
         super(Label.NEW, receiver);
+        addIntegerField("lines", Prompt.lines());
+        addIntegerField("columns", Prompt.columns());
     }
 
     @Override
     protected final void execute() throws CommandException {
-        // FIXME implement command
+        // FIXME Needs to handle saving older spreadsheetif requested
+        if (_receiver.getSpreadsheet() != null &&
+            Form.confirm(Prompt.saveBeforeExit())) {
+                String s = Form.requestString(Prompt.saveAs());
+        }
+        _receiver.newSpreadsheet(integerField("lines"), integerField("columns"));
     }
 
 }
