@@ -73,13 +73,16 @@ public abstract class CellStore {
 
     /**
      * Inserts and evaluates a given expression into a Cell of the store.
-     * @param addressSpecification ::= LINHA;COLUNA
+     * @param rangeSpecification ::= LINHA;COLUNA:LINHA;COLUNA | LINHA;COLUNA
      * @param expression
      * @throws FunctionNameException
      * @throws InvalidExpressionException
      */
-    public void insertExpression(String addressSpecification, String expression) throws FunctionNameException, InvalidExpressionException {
-        getCell(addressSpecification).updateExpression(this, expression, true);
+    public void insertExpression(String rangeSpecification, String expression) throws FunctionNameException, InvalidExpressionException {
+        Range range = getGama(rangeSpecification);
+        while (range.hasNext()) {
+            range.next().updateExpression(this, expression, true);
+        }
     }
 
     /**
