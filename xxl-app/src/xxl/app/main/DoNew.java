@@ -1,9 +1,13 @@
 package xxl.app.main;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
 import pt.tecnico.uilib.forms.Form;
 import pt.tecnico.uilib.menus.Command;
 import pt.tecnico.uilib.menus.CommandException;
 import xxl.Calculator;
+import xxl.exceptions.MissingFileAssociationException;
 
 /**
  * Open a new file.
@@ -18,10 +22,23 @@ class DoNew extends Command<Calculator> {
 
     @Override
     protected final void execute() throws CommandException {
-        // FIXME Needs to handle saving older spreadsheetif requested
         if (_receiver.getSpreadsheet() != null &&
             Form.confirm(Prompt.saveBeforeExit())) {
-                String s = Form.requestString(Prompt.saveAs());
+            try {
+                _receiver.save();
+            } catch (IOException e) {
+                throw new FileOpenFailedException(e);
+            } catch (MissingFileAssociationException e) {
+                String filename = Form.requestString(Prompt.saveAs());
+                try {
+                    _receiver.saveAs(filename);
+                } catch (IOException e2) {
+                    throw new FileOpenFailedException(e2);
+                } catch (MissingFileAssociationException e2) {
+                    /** why would saveAs throw this??? */
+                    throw new FileOpenFailedException(e2);
+                }
+            }
         }
         _receiver.newSpreadsheet(integerField("lines"), integerField("columns"));
     }

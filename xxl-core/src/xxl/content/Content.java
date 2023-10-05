@@ -1,11 +1,13 @@
 package xxl.content;
 
+import java.io.Serializable;
+
 import xxl.exceptions.UnexpectedContentException;
 
 /**
  * Class representing a value.
  */
-public abstract class Content {
+public abstract class Content implements Serializable {
 
     /**
      * @return the string content if it is a string

@@ -1,8 +1,11 @@
 package xxl;
 
 import java.io.IOException;
+import java.io.BufferedReader;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 
+import xxl.exceptions.FunctionNameException;
 import xxl.exceptions.ImportFileException;
 import xxl.exceptions.MissingFileAssociationException;
 import xxl.exceptions.UnavailableFileException;
@@ -18,6 +21,12 @@ public class Calculator {
     /** The current spreadsheet. */
     private Spreadsheet _spreadsheet = null;
 
+    /** The filename of the current spreadsheet */
+    private String _filename = null;
+
+    /** Store for user-spreadsheet relationship */
+    private DataStore _dataStore;
+
     // FIXME add more fields if needed
 
     /**
@@ -29,6 +38,7 @@ public class Calculator {
      */
     public void save() throws FileNotFoundException, MissingFileAssociationException, IOException {
         // FIXME implement serialization method
+        if (_filename == null) throw new MissingFileAssociationException();
     }
 
     /**
@@ -42,6 +52,8 @@ public class Calculator {
      */
     public void saveAs(String filename) throws FileNotFoundException, MissingFileAssociationException, IOException {
         // FIXME implement serialization method
+        _filename = filename;
+        save();
     }
 
     /**
@@ -61,14 +73,38 @@ public class Calculator {
      * @throws ImportFileException
      */
     public void importFile(String filename) throws ImportFileException {
-        try {
+        try (BufferedReader in = new BufferedReader(new FileReader(filename))) {
             // FIXME open import file and feed entries to new spreadsheet (in a cycle)
 	    //       each entry is inserted with:
-	    _spreadsheet.insertContents(/* FIXME produce arguments */);
+            String s;
+            int lines = Integer.parseInt(in.readLine().split("=")[1]);
+            int column = Integer.parseInt(in.readLine().split("=")[1]);
+            newSpreadsheet(lines, column);
+            while ((s = in.readLine()) != null) {
+                String[] line = new String(s.getBytes(), "UTF-8").split("\\|");
+                _spreadsheet.insertContents(line[0], line[1]);
+            }
+
 	    // ....
-        } catch (IOException | UnrecognizedEntryException /* FIXME maybe other exceptions */ e) {
+        } catch (IOException | UnrecognizedEntryException | FunctionNameException e) {
             throw new ImportFileException(filename, e);
         }
     }
 
+    /**
+     * Getter for the Spreadsheet.
+     * @return current opened spreadsheet.
+     */
+    public Spreadsheet getSpreadsheet() {
+        return _spreadsheet;
+    }
+
+    /**
+     * Creates a new spreadsheet with the given number of lines and columns.
+     * @param lines
+     * @param columns
+     */
+    public void newSpreadsheet(int lines, int columns) {
+        _spreadsheet = new Spreadsheet(lines, columns);
+    }
 }

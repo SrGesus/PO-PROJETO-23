@@ -12,6 +12,14 @@ public class IntContent extends Content {
     private int _content;
 
     /**
+     * Constructor to create an integer content from int.
+     * @param integer
+     */
+    public IntContent(int integer) {
+        _content = integer;
+    }
+
+    /**
      * Constructor to evaluate an expression into an integer content.
      * @param expression to be evaluated.
      * @throws InvalidExpressionException when the expression doesn't evaluate to a String.
