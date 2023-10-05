@@ -1,11 +1,15 @@
-all:
-	(cd xxl-core; make $(MFLAGS) all)
-	(cd xxl-app; make $(MFLAGS) all)
+PO_UILIB_DIR=/usr/share/java
+CLASSPATH=xxl-core/xxl-core.jar:xxl-app/xxl-app.jar:$(PO_UILIB_DIR)/po-uilib.jar
+
+all: xxl-core/xxl-core.jar xxl-app/xxl-app.jar
+	java -cp $(CLASSPATH) xxl.app.App
+
+xxl-core/xxl-core.jar: $(wildcard xxl-core/src/xxl/*.java) $(wildcard xxl-core/src/xxl/*/*.java)
+	$(MAKE) -C xxl-core PO_UILIB_DIR="$(PO_UILIB_DIR)"
+
+xxl-app/xxl-app.jar: $(wildcard xxl-app/src/xxl/app/*.java) $(wildcard xxl-app/src/xxl/app/*/*.java)
+	$(MAKE) -C xxl-app PO_UILIB_DIR="$(PO_UILIB_DIR)"
 
 clean:
-	(cd xxl-core; make $(MFLAGS) clean)
-	(cd xxl-app; make $(MFLAGS) clean)
-
-install:
-	(cd xxl-core; make $(MFLAGS) install)
-	(cd xxl-app; make $(MFLAGS) install)
+	$(MAKE) -C xxl-core clean
+	$(MAKE) -C xxl-app clean
