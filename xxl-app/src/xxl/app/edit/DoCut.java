@@ -12,7 +12,7 @@ class DoCut extends Command<Spreadsheet> {
 
     DoCut(Spreadsheet receiver) {
         super(Label.CUT, receiver);
-        // FIXME add fields
+        addStringField("gama", Prompt.address());
     }
 
     @Override

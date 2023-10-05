@@ -12,7 +12,7 @@ class DoPaste extends Command<Spreadsheet> {
 
     DoPaste(Spreadsheet receiver) {
         super(Label.PASTE, receiver);
-        // FIXME add fields
+        addStringField("gama", Prompt.address());
     }
 
     @Override

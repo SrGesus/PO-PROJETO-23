@@ -36,7 +36,7 @@ public class Spreadsheet implements Serializable {
     Spreadsheet(int lines, int columns) {
         _cellStore = new CellStoreArray(lines, columns);
     }
-    // FIXME define methods
+    
     /**
      * @param addressExpression ::= LINHA;COLUNA
      * @return the Cell
@@ -66,7 +66,7 @@ public class Spreadsheet implements Serializable {
 
     /**
      * Insert specified content in specified range.
-     * @param rangeSpecification ::= LINHA;COLUNA
+     * @param rangeSpecification ::= LINHA;COLUNA:LINHA;COLUNA | LINHA;COLUNA
      * @param contentSpecification an expression
      */
     public void insertContents(String rangeSpecification, String contentSpecification) throws UnrecognizedEntryException, FunctionNameException {
