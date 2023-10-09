@@ -25,9 +25,11 @@ public class Spreadsheet implements Serializable {
     /** Flexible storage for Cells */
     private CellStore _cellStore;
 
-    /**  */
+    /** Set of user names */
     private Set<String> _users = null;
 
+    /** */
+    private String _filename = null;
     /**
      * Constructor.
      * @param lines
@@ -83,5 +85,15 @@ public class Spreadsheet implements Serializable {
     public void addUser(User user) {
         if (_users == null) _users = new HashSet<String>();
         _users.add(user.getName());
+        user.addSpreadsheet(_filename);
+    }
+
+    /**
+     * Changes the filename of this spreadsheet.
+     * @param filename
+     */
+    public void rename(DataStore store, String filename) {
+        store.renameSpreadsheet(_filename, filename);
+        _filename = filename;
     }
 }

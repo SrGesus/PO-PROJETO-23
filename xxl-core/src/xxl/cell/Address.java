@@ -30,8 +30,8 @@ class Address {
         try {
             String[] address = expression.split(";");
             if (address.length != 2) throw new InvalidAddressException(expression);
-            _line = Integer.parseInt(address[0]);
-            _column = Integer.parseInt(address[1]);
+            _line = Integer.parseInt(address[0]) - 1;
+            _column = Integer.parseInt(address[1]) - 1;
             if (_line < 0 || _column < 0) throw new InvalidAddressException(expression);
         } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
             throw new InvalidAddressException(expression);
@@ -77,7 +77,7 @@ class Address {
     /** @see Object#toString() */
     @Override
     public String toString() {
-        return _line + ";" + _column;
+        return (_line + 1) + ";" + (_column + 1);
     }
 
     /** @see Object#equals(Object) */

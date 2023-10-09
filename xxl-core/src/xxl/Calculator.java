@@ -30,9 +30,7 @@ public class Calculator {
 
     /** Store for user-spreadsheet relationship */
     private DataStore _dataStore;
-
-    // FIXME add more fields if needed
-
+    
     /**
      * Saves the serialized application's state into the file associated to the current network.
      *
@@ -121,5 +119,6 @@ public class Calculator {
      */
     public void newSpreadsheet(int lines, int columns) {
         _spreadsheet = new Spreadsheet(lines, columns);
+        _filename = null;
     }
 }
