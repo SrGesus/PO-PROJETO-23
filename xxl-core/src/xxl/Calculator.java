@@ -1,8 +1,12 @@
 package xxl;
 
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 
 import xxl.exceptions.FunctionNameException;
@@ -26,9 +30,7 @@ public class Calculator {
 
     /** Store for user-spreadsheet relationship */
     private DataStore _dataStore;
-
-    // FIXME add more fields if needed
-
+    
     /**
      * Saves the serialized application's state into the file associated to the current network.
      *
@@ -39,6 +41,9 @@ public class Calculator {
     public void save() throws FileNotFoundException, MissingFileAssociationException, IOException {
         // FIXME implement serialization method
         if (_filename == null) throw new MissingFileAssociationException();
+        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(_filename))) {
+            out.writeObject(this);
+        }
     }
 
     /**
@@ -63,7 +68,15 @@ public class Calculator {
      *         an error while processing this file.
      */
     public void load(String filename) throws UnavailableFileException {
-        // FIXME implement serialization method
+        // FIXME implement serialization 
+        if (filename == null || filename.equals("")) throw new UnavailableFileException(filename);
+
+        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(filename))) {
+            _spreadsheet = (Spreadsheet) in.readObject();
+            _filename = filename;
+        } catch (IOException | ClassNotFoundException e) {
+            throw new UnavailableFileException(filename);
+        }
     }
 
     /**
@@ -106,5 +119,6 @@ public class Calculator {
      */
     public void newSpreadsheet(int lines, int columns) {
         _spreadsheet = new Spreadsheet(lines, columns);
+        _filename = null;
     }
 }

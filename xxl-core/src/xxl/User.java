@@ -7,6 +7,7 @@ import java.util.List;
  * Represents an user of the Calculator.
  */
 public class User implements Serializable {
+
     /** User name */
     private String _name;
 
@@ -17,18 +18,41 @@ public class User implements Serializable {
      * Constructor.
      * @param name of the user
      */
-    public User(String name) {
+    User(String name) {
         _name = name;
     }
 
+    /**
+     * Add a spreadsheet to this User.
+     * @param filename
+     */
     public void addSpreadsheet(String filename) {
+        if (filename == null) return;
         _spreadsheets.add(filename);
     }
 
+    /**
+     * Remove spreadsheet from this User.
+     * @param filename
+     */
     public void removeSpreadsheet(String filename) {
+        if (filename == null) return;
         _spreadsheets.remove(filename);
     }
 
+    /**
+     * Replaces name of a spreadsheet.
+     * @param oldFilename
+     * @param newFilename
+     */
+    public void renameSpreadsheet(String oldFilename, String newFilename) {
+        removeSpreadsheet(oldFilename);
+        addSpreadsheet(newFilename);
+    }
+
+    /**
+     * @return user's name.
+     */
     public String getName() {
         return _name;
     }
