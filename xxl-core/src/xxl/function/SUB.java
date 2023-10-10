@@ -19,6 +19,7 @@ public class SUB extends BinaryFunction {
         super(store, output, args);
     }
 
+    /** @see xxl.function.BinaryFunction#compute(int, int) */
     @Override
     protected int compute(int arg1, int arg2) {
         return arg1 - arg2;

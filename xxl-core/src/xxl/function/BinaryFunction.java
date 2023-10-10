@@ -11,7 +11,7 @@ import xxl.exceptions.UnexpectedContentException;
  * A Function that receives two integer arguments.
  * Returns an integer.
  */
-public abstract class BinaryFunction extends FunctionStrategy{
+public abstract class BinaryFunction extends FunctionStrategy {
 
     /**
      * Constructor.
@@ -21,7 +21,7 @@ public abstract class BinaryFunction extends FunctionStrategy{
      * @throws FunctionArgException
      */
     public BinaryFunction(CellStore store, Cell output, String... args) throws FunctionArgException {
-        super(c -> c.getContent() instanceof IntContent, output);
+        super(output);
         if (args.length != 2) throw new FunctionArgException();
         addCellArg(store, "arg1", args[0]);
         addCellArg(store, "arg2", args[1]);
@@ -39,5 +39,18 @@ public abstract class BinaryFunction extends FunctionStrategy{
         }
     }
 
+    /** @see xxl.function.FunctionStrategy#isValidInput */
+    @Override
+    protected boolean isValidInput(Cell c) {
+        return c.getContent() instanceof IntContent;
+    }
+
+    /**
+     * Template method that computes the result of the function.
+     * @param arg1
+     * @param arg2
+     * @return
+     * @throws FunctionArgException
+     */
     protected abstract int compute(int arg1, int arg2) throws FunctionArgException;
 }
