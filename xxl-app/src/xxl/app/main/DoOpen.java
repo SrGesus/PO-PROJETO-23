@@ -16,7 +16,7 @@ class DoOpen extends Command<Calculator> {
 
     DoOpen(Calculator receiver) {
         super(Label.OPEN, receiver);
-        addStringField("filename", Prompt.openFile());
+        // addStringField("filename", Prompt.openFile());
     }
 
     @Override
@@ -40,10 +40,9 @@ class DoOpen extends Command<Calculator> {
             }
         }
         try {
-            _receiver.load(stringField("filename"));
+            _receiver.load(Form.requestString(Prompt.openFile()));
         } catch (UnavailableFileException e) {
             throw new FileOpenFailedException(e);
         }
     }
-
 }
