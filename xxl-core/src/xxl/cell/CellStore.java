@@ -1,5 +1,7 @@
 package xxl.cell;
 
+import java.io.Serializable;
+
 import xxl.exceptions.FunctionNameException;
 import xxl.exceptions.InvalidAddressException;
 import xxl.exceptions.InvalidExpressionException;
@@ -8,7 +10,7 @@ import xxl.exceptions.InvalidRangeException;
 /**
  * Class that stores all Cells of a Spreadsheet.
  */
-public abstract class CellStore {
+public abstract class CellStore implements Serializable {
 
     /** Whether there are unsaved changes */
     boolean _dirty = true;

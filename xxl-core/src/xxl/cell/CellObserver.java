@@ -1,11 +1,13 @@
 package xxl.cell;
 
+import java.io.Serializable;
+
 /** 
  * Observer design pattern for Cells. 
  * To notify a Cell (subject Cell) when a Cell's Content that
  * they depend on (observed Cell) is changed.
  */
-public class CellObserver {
+public class CellObserver implements Serializable {
 
     /** The Cell that is to be notified */
     Cell _subject;

@@ -1,6 +1,5 @@
 package xxl.app.main;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import pt.tecnico.uilib.forms.Form;
@@ -35,7 +34,7 @@ class DoNew extends Command<Calculator> {
                 } catch (IOException e2) {
                     throw new FileOpenFailedException(e2);
                 } catch (MissingFileAssociationException e2) {
-                    /** why would saveAs throw this??? */
+                    /** Unreachable */
                     throw new FileOpenFailedException(e2);
                 }
             }

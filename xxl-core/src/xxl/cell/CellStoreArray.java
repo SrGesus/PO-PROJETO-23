@@ -1,5 +1,7 @@
 package xxl.cell;
 
+import java.io.Serializable;
+
 /**
  * Class that stores all Cells of a Spreadsheet in a primitive array.
  * Will only create lines and cells when needed.

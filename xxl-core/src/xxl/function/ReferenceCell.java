@@ -19,11 +19,18 @@ public class ReferenceCell extends FunctionStrategy {
      * @throws FunctionArgException
      */
     public ReferenceCell(CellStore store, Cell output, String... args) throws FunctionArgException {
-        super(c -> true, output);
+        super(output);
         if (args.length != 1) throw new FunctionArgException();
         addCellArg(store, "reference", args[0]);
     }
 
+    /** @see xxl.function.FunctionStrategy#isValidInput */
+    @Override
+    protected boolean isValidInput(Cell c) {
+        return true;
+    }
+
+    /** @see xxl.function.FunctionStrategy#result() */
     @Override
     protected Content result() {
         return getCellArg("reference").getContent();

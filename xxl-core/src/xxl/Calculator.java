@@ -39,10 +39,9 @@ public class Calculator {
      * @throws IOException if there is some error while serializing the state of the network to disk.
      */
     public void save() throws FileNotFoundException, MissingFileAssociationException, IOException {
-        // FIXME implement serialization method
         if (_filename == null) throw new MissingFileAssociationException();
         try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(_filename))) {
-            out.writeObject(this);
+            out.writeObject(_spreadsheet);
         }
     }
 
@@ -56,7 +55,6 @@ public class Calculator {
      * @throws IOException if there is some error while serializing the state of the network to disk.
      */
     public void saveAs(String filename) throws FileNotFoundException, MissingFileAssociationException, IOException {
-        // FIXME implement serialization method
         _filename = filename;
         save();
     }
@@ -68,7 +66,6 @@ public class Calculator {
      *         an error while processing this file.
      */
     public void load(String filename) throws UnavailableFileException {
-        // FIXME implement serialization 
         if (filename == null || filename.equals("")) throw new UnavailableFileException(filename);
 
         try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(filename))) {
