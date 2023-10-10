@@ -38,6 +38,6 @@ public class StringContent extends Content {
 
     @Override
     public String toString() {
-        return _content;
+        return "'" + _content;
     }
 }
