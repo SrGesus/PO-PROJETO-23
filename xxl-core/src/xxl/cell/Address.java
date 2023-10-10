@@ -7,10 +7,10 @@ import xxl.exceptions.InvalidAddressException;
  */
 class Address {
     /** The line of this address */
-    int _line;
+    private int _line;
 
     /** The column of this address */
-    int _column;
+    private int _column;
 
     /**
      * Constructor for int parameters.

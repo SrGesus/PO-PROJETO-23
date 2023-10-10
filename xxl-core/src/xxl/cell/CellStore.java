@@ -13,13 +13,13 @@ import xxl.exceptions.InvalidRangeException;
 public abstract class CellStore implements Serializable {
 
     /** Whether there are unsaved changes */
-    boolean _dirty = true;
+    private boolean _dirty = true;
 
     /** Number of lines in this store */
-    int _lines;
+    private int _lines;
 
     /** Number of columns in this store */
-    int _columns;
+    private int _columns;
 
     /**
      * Constructor.

@@ -10,7 +10,7 @@ import java.io.Serializable;
 public class CellObserver implements Serializable {
 
     /** The Cell that is to be notified */
-    Cell _subject;
+    private Cell _subject;
 
     /**
      * Constructor.
