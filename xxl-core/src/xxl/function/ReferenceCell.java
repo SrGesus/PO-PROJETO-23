@@ -3,6 +3,8 @@ package xxl.function;
 import xxl.cell.Cell;
 import xxl.cell.CellStore;
 import xxl.content.Content;
+import xxl.content.ErrorContent;
+import xxl.content.NullContent;
 import xxl.exceptions.FunctionArgException;
 
 /**
@@ -27,7 +29,7 @@ public class ReferenceCell extends FunctionStrategy {
     /** @see xxl.function.FunctionStrategy#isValidInput */
     @Override
     protected boolean isValidInput(Cell c) {
-        return true;
+        return !(c.getContent() instanceof NullContent) && !(c.getContent() instanceof ErrorContent);
     }
 
     /** @see xxl.function.FunctionStrategy#result() */
