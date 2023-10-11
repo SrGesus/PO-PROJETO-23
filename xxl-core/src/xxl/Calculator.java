@@ -15,8 +15,6 @@ import xxl.exceptions.MissingFileAssociationException;
 import xxl.exceptions.UnavailableFileException;
 import xxl.exceptions.UnrecognizedEntryException;
 
-// FIXME import classes
-
 /**
  * Class representing a spreadsheet application.
  */
@@ -28,9 +26,12 @@ public class Calculator {
     /** The filename of the current spreadsheet */
     private String _filename = null;
 
+    /** Current user */
+    private String _user = "root";
+
     /** Store for user-spreadsheet relationship */
-    private DataStore _dataStore;
-    
+    private DataStore _dataStore = new DataStore(_user);
+
     /**
      * Saves the serialized application's state into the file associated to the current network.
      *
@@ -41,7 +42,7 @@ public class Calculator {
     public void save() throws FileNotFoundException, MissingFileAssociationException, IOException {
         if (_filename == null) throw new MissingFileAssociationException();
         try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(_filename))) {
-            out.writeObject(_spreadsheet);
+            out.writeObject(getSpreadsheet());
         }
     }
 
@@ -84,8 +85,6 @@ public class Calculator {
      */
     public void importFile(String filename) throws ImportFileException {
         try (BufferedReader in = new BufferedReader(new FileReader(filename))) {
-            // FIXME open import file and feed entries to new spreadsheet (in a cycle)
-	    //       each entry is inserted with:
             String s;
             int lines = Integer.parseInt(in.readLine().split("=")[1]);
             int column = Integer.parseInt(in.readLine().split("=")[1]);
@@ -117,5 +116,6 @@ public class Calculator {
     public void newSpreadsheet(int lines, int columns) {
         _spreadsheet = new Spreadsheet(lines, columns);
         _filename = null;
+        _dataStore.addSpreadsheet(_filename, _user);
     }
 }

@@ -1,9 +1,14 @@
-PO_UILIB_DIR=../../po-uilib
 JARNAME=xxl-core
+JAVA = $(shell find . -name \*.java)
+CLASS = $(JAVA:.java=.class)
 
-all:
-	(cd src; javac -cp . -encoding UTF-8 `find . -name \*.java`)
+all: $(JARNAME).jar
+
+$(JARNAME).jar: $(CLASS)
 	(cd src; jar cf ../$(JARNAME).jar `find . -name \*.class -o -name \*.java` )
+
+%.class: %.java
+	javac -cp src -encoding UTF-8 $?
 
 clean:
 	$(RM) $(JARNAME).jar `find . -name \*.class`
