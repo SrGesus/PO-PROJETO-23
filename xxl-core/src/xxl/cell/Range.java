@@ -39,21 +39,23 @@ public class Range implements Iterator<Cell> {
                 _endAddress = new Address(range[1]);
                 _store = store;
 
-
-                /** Attempt to get the last cell to make sure range is in bounds */
-                store.getCell(_endAddress);
-
-                /** Check if Range start is before the end */
-                if (_startAddress.getLine() > _endAddress.getLine() || 
-                    _startAddress.getColumn() > _endAddress.getColumn()) {
-                    throw new InvalidRangeException(rangeSpecification);
-                }
-
+                
                 /** Check if Range is either a line or a column */
                 if (_startAddress.getLine() != _endAddress.getLine() &&
                     _startAddress.getColumn() != _endAddress.getColumn()) {
                     throw new InvalidRangeException(rangeSpecification);
                 }
+
+                /** Check if Range start is before the end */
+                if (_startAddress.getLine() > _endAddress.getLine() || 
+                    _startAddress.getColumn() > _endAddress.getColumn()) {
+                    _startAddress = _endAddress;
+                    _endAddress = _currentAddress;
+                    _currentAddress = _startAddress;
+                }
+                
+                /** Attempt to get the last cell to make sure range is in bounds */
+                store.getCell(_endAddress);
             } catch (InvalidAddressException | IndexOutOfBoundsException e) {
                 throw new InvalidRangeException(rangeSpecification);
             }

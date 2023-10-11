@@ -18,7 +18,7 @@ public class CellStoreArray extends CellStore {
      */
     public CellStoreArray(int lines, int columns) {
         super(lines, columns);
-        _cells = new Cell[_lines][];
+        _cells = new Cell[getLines()][];
     }
 
     /**
@@ -30,7 +30,7 @@ public class CellStoreArray extends CellStore {
      */
     public Cell getCell(Address addr) {
         Cell[] line = _cells[addr.getLine()];
-        if (line == null) line = _cells[addr.getLine()] = new Cell[_columns];
+        if (line == null) line = _cells[addr.getLine()] = new Cell[getColumns()];
         Cell cell = line[addr.getColumn()];
         if (cell == null) cell = line[addr.getColumn()] = new Cell();
         return cell;

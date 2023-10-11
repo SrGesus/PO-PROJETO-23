@@ -30,6 +30,10 @@ public class Spreadsheet implements Serializable {
 
     /** */
     private String _filename = null;
+
+    /** Whether there are unsaved changes */
+    private boolean _dirty = true;
+
     /**
      * Constructor.
      * @param lines
@@ -39,6 +43,27 @@ public class Spreadsheet implements Serializable {
         _cellStore = new CellStoreArray(lines, columns);
     }
     
+    /**
+     * THere are unsaved changes.
+     */
+    void dirty() {
+        _dirty = true;
+    }
+
+    /**
+     * There are no unsaved changes.
+     */
+    void clean() {
+        _dirty = false;
+    }
+
+    /**
+     * @return whether there are unsaved changes.
+     */
+    public boolean isDirty() {
+        return _dirty;
+    }
+
     /**
      * @param addressExpression ::= LINHA;COLUNA
      * @return the Cell
@@ -74,6 +99,7 @@ public class Spreadsheet implements Serializable {
     public void insertContents(String rangeSpecification, String contentSpecification) throws UnrecognizedEntryException, FunctionNameException {
         try {
             _cellStore.insertExpression(rangeSpecification, contentSpecification);
+            dirty();
         } catch (InvalidExpressionException e) {
             throw new UnrecognizedEntryException(e.getExpression());
         }
@@ -86,6 +112,7 @@ public class Spreadsheet implements Serializable {
         if (_users == null) _users = new HashSet<String>();
         _users.add(user.getName());
         user.addSpreadsheet(_filename);
+        dirty();
     }
 
     /**

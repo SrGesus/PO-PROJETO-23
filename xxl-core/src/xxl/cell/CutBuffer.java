@@ -10,7 +10,7 @@ public class CutBuffer{
 
     int _columns;
 
-    CellStore _buffer = new CellStore(_lines, _columns);
+    CellStore _buffer = new CellStoreArray(_lines, _columns);
 
     /**
      * Constructor

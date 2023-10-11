@@ -12,9 +12,6 @@ import xxl.exceptions.InvalidRangeException;
  */
 public abstract class CellStore implements Serializable {
 
-    /** Whether there are unsaved changes */
-    private boolean _dirty = true;
-
     /** Number of lines in this store */
     private int _lines;
 
@@ -29,6 +26,20 @@ public abstract class CellStore implements Serializable {
     public CellStore(int lines, int columns) {
         _lines = lines;
         _columns = columns;
+    }
+
+    /**
+     * @return the number of lines
+     */
+    public int getLines() {
+        return _lines;
+    }
+
+    /**
+     * @return the number of columns
+     */
+    public int getColumns() {
+        return _columns;
     }
 
     /**

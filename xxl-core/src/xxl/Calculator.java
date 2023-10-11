@@ -40,7 +40,10 @@ public class Calculator {
      * @throws IOException if there is some error while serializing the state of the network to disk.
      */
     public void save() throws FileNotFoundException, MissingFileAssociationException, IOException {
-        if (_filename == null) throw new MissingFileAssociationException();
+        if (_filename == null)
+            throw new MissingFileAssociationException();
+    
+        _spreadsheet.clean();
         try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(_filename))) {
             out.writeObject(getSpreadsheet());
         }
@@ -91,6 +94,7 @@ public class Calculator {
             newSpreadsheet(lines, column);
             while ((s = in.readLine()) != null) {
                 String[] line = new String(s.getBytes(), "UTF-8").split("\\|");
+                if (line.length != 2) continue;
                 _spreadsheet.insertContents(line[0], line[1]);
             }
 
@@ -117,5 +121,12 @@ public class Calculator {
         _spreadsheet = new Spreadsheet(lines, columns);
         _filename = null;
         _dataStore.addSpreadsheet(_filename, _user);
+    }
+
+    /*
+     * @return whether there are unsaved changes.
+     */
+    public boolean isDirty() {
+        return _spreadsheet != null && _spreadsheet.isDirty();
     }
 }
