@@ -1,10 +1,7 @@
 package xxl;
 
-// FIXME import classes
-
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -30,6 +27,10 @@ public class Spreadsheet implements Serializable {
 
     /** */
     private String _filename = null;
+
+    /** Whether there are unsaved changes */
+    private boolean _dirty = true;
+
     /**
      * Constructor.
      * @param lines
@@ -39,6 +40,28 @@ public class Spreadsheet implements Serializable {
         _cellStore = new CellStoreArray(lines, columns);
     }
     
+    /**
+     * THere are unsaved changes.
+     */
+    void dirty() {
+        _dirty = true;
+    }
+
+    /**
+     * There are no unsaved changes.
+     */
+    void clean() {
+        _dirty = false;
+        _cellStore.cleanUp();
+    }
+
+    /**
+     * @return whether there are unsaved changes.
+     */
+    public boolean isDirty() {
+        return _dirty;
+    }
+
     /**
      * @param addressExpression ::= LINHA;COLUNA
      * @return the Cell
@@ -62,8 +85,8 @@ public class Spreadsheet implements Serializable {
      * @return 
      * @throws InvalidRangeException
      */
-    public Collection<String> showGama(String rangeSpecification) throws InvalidRangeException {
-        return getGama(rangeSpecification).toStrings();
+    public Iterable<String> showGama(String rangeSpecification) throws InvalidRangeException {
+        return getGama(rangeSpecification).iterStrings();
     }
 
     /**
@@ -73,7 +96,11 @@ public class Spreadsheet implements Serializable {
      */
     public void insertContents(String rangeSpecification, String contentSpecification) throws UnrecognizedEntryException, FunctionNameException {
         try {
-            _cellStore.insertExpression(rangeSpecification, contentSpecification);
+            if (contentSpecification.isBlank())
+                _cellStore.deleteGama(rangeSpecification);
+            else
+                _cellStore.insertExpression(rangeSpecification, contentSpecification);
+            dirty();
         } catch (InvalidExpressionException e) {
             throw new UnrecognizedEntryException(e.getExpression());
         }
@@ -86,6 +113,7 @@ public class Spreadsheet implements Serializable {
         if (_users == null) _users = new HashSet<String>();
         _users.add(user.getName());
         user.addSpreadsheet(_filename);
+        dirty();
     }
 
     /**

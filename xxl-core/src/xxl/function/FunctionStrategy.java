@@ -1,13 +1,12 @@
 package xxl.function;
 
 import java.io.Serializable;
-import java.util.Collection;
 import java.util.Map;
 import java.util.HashMap;
-import java.util.function.Predicate;
 
 import xxl.cell.Cell;
 import xxl.cell.CellStore;
+import xxl.cell.Range;
 import xxl.cell.CellObserver;
 import xxl.content.Content;
 import xxl.content.ErrorContent;
@@ -27,7 +26,7 @@ public abstract class FunctionStrategy implements Serializable {
 
     /** The Arguments this Function depends on */
     private Map<String, Cell> _argCells = new HashMap<>();
-    private Map<String, Collection<Cell>> _argRanges = new HashMap<>(1);
+    private Map<String, Range> _argRanges = new HashMap<>(1);
 
     /** 
      * The Observer of the Cell that stores the output of this function.
@@ -78,9 +77,9 @@ public abstract class FunctionStrategy implements Serializable {
      */
     protected void addRangeArg(CellStore store, String key, String expression) throws FunctionArgException {
         try {
-            Collection<Cell> range = store.getRange(expression).collect();
+            Range range = store.getRange(expression);
+            range.iterCells().forEach(c -> c.attach(_output));
             _argRanges.put(key, range);
-            range.forEach(v -> v.attach(_output));
         } catch (InvalidRangeException e) {
             throw new FunctionArgException();
         }
@@ -90,7 +89,7 @@ public abstract class FunctionStrategy implements Serializable {
      * @param key
      * @return range argument of given key.
      */
-    protected Collection<Cell> getRangeArg(String key) {
+    protected Range getRangeArg(String key) {
         return _argRanges.get(key);                     
     }
 
@@ -102,8 +101,8 @@ public abstract class FunctionStrategy implements Serializable {
         /** If any of the values does not pass the given isValidInput predicate, return Error content */
         for (Cell c : _argCells.values())
             if (!isValidInput(c)) return new ErrorContent();
-        for (Collection<Cell> r : _argRanges.values())
-            for (Cell c : r) if (!isValidInput(c)) return new ErrorContent();
+        for (Range r : _argRanges.values())
+            for (Cell c : r.iterCellsReadOnly()) if (!isValidInput(c)) return new ErrorContent();
         try {
             return result();
         } catch (FunctionArgException e) {
@@ -132,6 +131,6 @@ public abstract class FunctionStrategy implements Serializable {
     public void cleanFunction() {
         /* Stop arguments from notifying their changes */
         _argCells.values().forEach(c -> _output.detach(c));
-        _argRanges.values().forEach(r -> r.forEach(c -> _output.detach(c)));
+        _argRanges.values().forEach(r -> r.iterCells().forEach(c -> _output.detach(c)));
     }
 }

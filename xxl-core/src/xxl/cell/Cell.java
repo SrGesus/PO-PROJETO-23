@@ -21,19 +21,19 @@ public class Cell implements Serializable {
      * The expression inside this Cell 
      * @see xxl.cell.Cell#setExpression(String)
      */
-    String _expression = "";
+    private String _expression = "";
 
     /** The content of this Cell */
-    Content _content = new NullContent();
+    private Content _content = new NullContent();
 
     /** Function that the expression of the Cell represents */
-    FunctionStrategy _function = null;
+    private FunctionStrategy _function = null;
 
     /** True if content might have to be recalculated. */
-    boolean dirty = false;
+    private boolean dirty = false;
 
     /** A Collection of the observers of this Cell that need to be notified. */
-    Set<CellObserver> _observers = null;
+    private Set<CellObserver> _observers = null;
 
     /**
      * Package-private constructor.
@@ -221,6 +221,15 @@ public class Cell implements Serializable {
         Cell cell = new Cell();
         cell.setExpression(cell._expression);
         return cell;
+    }
+
+    /**
+     * @return true if Cell has no content and is not being observed.
+     */
+    public boolean isDeletable() {
+        return _content instanceof NullContent &&
+            _function == null &&
+            (_observers == null || _observers.isEmpty());
     }
 
     /** @see Object#toString() */

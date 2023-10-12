@@ -1,6 +1,6 @@
 package xxl.cell;
 
-import java.io.Serializable;
+import xxl.exceptions.InvalidAddressException;
 
 /**
  * Class that stores all Cells of a Spreadsheet in a primitive array.
@@ -18,22 +18,92 @@ public class CellStoreArray extends CellStore {
      */
     public CellStoreArray(int lines, int columns) {
         super(lines, columns);
-        _cells = new Cell[_lines][];
+        _cells = new Cell[getLines()][];
     }
 
     /**
-     * Getter for the cell that will create new cell 
-     * if it doesn't exist at the address.
-     * @param line
-     * @param column
-     * @return the Cell
+     * If the Cell is not in the store, an empty Cell will be created in the store.
+     * @param addr
+     * @return the Cell at the given Address
+     * @throws InvalidAddressException
+     * @see CellStore#getCell(Address)
      */
-    public Cell getCell(Address addr) {
-        Cell[] line = _cells[addr.getLine()];
-        if (line == null) line = _cells[addr.getLine()] = new Cell[_columns];
-        Cell cell = line[addr.getColumn()];
-        if (cell == null) cell = line[addr.getColumn()] = new Cell();
-        return cell;
+    @Override
+    public Cell getCell(Address address) throws InvalidAddressException {
+        try {
+            Cell[] line = _cells[address.getLine()];
+            if (line == null) line = _cells[address.getLine()] = new Cell[getColumns()];
+            Cell cell = line[address.getColumn()];
+            if (cell == null) cell = line[address.getColumn()] = new Cell();
+            return cell;
+        } catch (IndexOutOfBoundsException e) {
+            throw new InvalidAddressException(address.toString());
+        }
     };
+
+    /**
+     * If the Cell is not in the store, an empty Cell unnattached to the store is returned.
+     * @param addr
+     * @return the Cell at the given Address if it exists, an empty Cell otherwise.
+     * @throws InvalidAddressException
+     * @see CellStore#getCellReadOnly(Address)
+     */
+    @Override
+    public Cell getCellReadOnly(Address address) throws InvalidAddressException {
+        try {
+            Cell[] line = _cells[address.getLine()];
+            if (line == null) return new Cell();
+            Cell cell = line[address.getColumn()];
+            if (cell == null) return new Cell();
+            return cell;
+        } catch (IndexOutOfBoundsException e) {
+            throw new InvalidAddressException(address.toString());
+        }
+    };
+
+    /**
+     * Removes Cell from the store if it is empty,
+     * and without observers.
+     * @param addr
+     * @see CellStore#deleteEmptyCell(Address)
+     */
+    @Override
+    public void deleteEmptyCell(Address address) {
+        try {
+            Cell[] line = _cells[address.getLine()];
+            if (line == null) return;
+            Cell cell = line[address.getColumn()];
+            if (cell == null) return;
+            line[address.getColumn()] = null;
+        } catch (IndexOutOfBoundsException e) {
+            return;
+        }
+    };
+
+    /** 
+     * Will remove all empty lines from the store.
+     * @see CellStore#cleanUp() 
+     */
+    @Override
+    public void cleanUp() {
+        for (int i = 0; i < getLines(); i++) {
+            Cell[] line = _cells[i];
+            boolean empty = true;
+            if (line == null) continue;
+            for (int j = 0; j < getColumns(); j++) {
+                Cell cell = line[j];
+                if (cell != null) {
+                    if (cell.isDeletable()) {
+                        line[j] = null;
+                        continue;
+                    }
+                    empty = false;
+                    break;
+                }
+            }
+            if (empty) _cells[i] = null;
+        }
+    }
+
 
 }

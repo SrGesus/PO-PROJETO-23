@@ -21,7 +21,7 @@ class DoOpen extends Command<Calculator> {
 
     @Override
     protected final void execute() throws CommandException {
-        if (_receiver.getSpreadsheet() != null &&
+        if (_receiver.isDirty() &&
             Form.confirm(Prompt.saveBeforeExit())) {
             try {
                 _receiver.save();
