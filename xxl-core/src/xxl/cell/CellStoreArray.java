@@ -86,12 +86,17 @@ public class CellStoreArray extends CellStore {
      */
     @Override
     public void cleanUp() {
-        for (int i = 0; i < getColumns(); i++) {
+        for (int i = 0; i < getLines(); i++) {
             Cell[] line = _cells[i];
             boolean empty = true;
             if (line == null) continue;
-            for (Cell cell : line) {
-                if (cell != null && !cell.isDeletable()) {
+            for (int j = 0; j < getColumns(); j++) {
+                Cell cell = line[j];
+                if (cell != null) {
+                    if (cell.isDeletable()) {
+                        line[j] = null;
+                        continue;
+                    }
                     empty = false;
                     break;
                 }

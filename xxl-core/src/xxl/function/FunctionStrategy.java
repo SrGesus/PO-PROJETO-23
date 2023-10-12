@@ -1,10 +1,8 @@
 package xxl.function;
 
 import java.io.Serializable;
-import java.util.Collection;
 import java.util.Map;
 import java.util.HashMap;
-import java.util.function.Predicate;
 
 import xxl.cell.Cell;
 import xxl.cell.CellStore;

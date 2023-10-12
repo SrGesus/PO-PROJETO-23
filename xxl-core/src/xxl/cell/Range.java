@@ -35,11 +35,11 @@ public class Range {
             _store = store;
 
             
-            // /** Check if Range is either a line or a column */
-            // if (_startAddress.getLine() != _endAddress.getLine() &&
-            //     _startAddress.getColumn() != _endAddress.getColumn()) {
-            //     throw new InvalidRangeException(rangeSpecification);
-            // }
+            /** Check if Range is either a line or a column */
+            if (_startAddress.getLine() != _endAddress.getLine() &&
+                _startAddress.getColumn() != _endAddress.getColumn()) {
+                throw new InvalidRangeException(rangeSpecification);
+            }
 
             /** If Range start is before the end switch order */
             if (_startAddress.getLine() > _endAddress.getLine() || 
@@ -223,7 +223,7 @@ public class Range {
                 else {
                     _currentAddress = _currentAddress.nextLine();
                     /* This is not needed for single column/line ranges */
-                    _currentAddress.setColumn(_startAddress.getColumn());
+                    // _currentAddress.setColumn(_startAddress.getColumn());
                 }
                 return result;
             } catch (InvalidAddressException e) {
