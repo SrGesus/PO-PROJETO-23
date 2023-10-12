@@ -20,7 +20,7 @@ class DoShow extends Command<Spreadsheet> {
     protected final void execute() throws CommandException {
         // FIXME implement command
         try {
-            _display.popup(_receiver.showGama(stringField("gama")));
+            _receiver.showGama(stringField("gama")).forEach(str -> _display.popup(str));
         } catch (InvalidRangeException e) {
             throw new InvalidCellRangeException(e.getExpression());
         }

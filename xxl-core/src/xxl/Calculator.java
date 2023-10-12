@@ -40,10 +40,9 @@ public class Calculator {
      * @throws IOException if there is some error while serializing the state of the network to disk.
      */
     public void save() throws FileNotFoundException, MissingFileAssociationException, IOException {
-        if (_filename == null)
-            throw new MissingFileAssociationException();
-    
+        if (_filename == null) throw new MissingFileAssociationException();
         _spreadsheet.clean();
+        _dataStore.addSpreadsheet(_filename, _user);
         try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(_filename))) {
             out.writeObject(getSpreadsheet());
         }
@@ -88,17 +87,18 @@ public class Calculator {
      */
     public void importFile(String filename) throws ImportFileException {
         try (BufferedReader in = new BufferedReader(new FileReader(filename))) {
-            String s;
+            /* Read line and column */
             int lines = Integer.parseInt(in.readLine().split("=")[1]);
             int column = Integer.parseInt(in.readLine().split("=")[1]);
             newSpreadsheet(lines, column);
+            /* Read each line in a loop */
+            String s;
             while ((s = in.readLine()) != null) {
                 String[] line = new String(s.getBytes(), "UTF-8").split("\\|");
+                /* Ignore empty cells */
                 if (line.length != 2) continue;
                 _spreadsheet.insertContents(line[0], line[1]);
             }
-
-	    // ....
         } catch (IOException | UnrecognizedEntryException | FunctionNameException e) {
             throw new ImportFileException(filename, e);
         }
@@ -106,6 +106,7 @@ public class Calculator {
 
     /**
      * Getter for the Spreadsheet.
+     * 
      * @return current opened spreadsheet.
      */
     public Spreadsheet getSpreadsheet() {
@@ -114,6 +115,7 @@ public class Calculator {
 
     /**
      * Creates a new spreadsheet with the given number of lines and columns.
+     * 
      * @param lines
      * @param columns
      */
@@ -123,8 +125,8 @@ public class Calculator {
         _dataStore.addSpreadsheet(_filename, _user);
     }
 
-    /*
-     * @return whether there are unsaved changes.
+    /**
+     * @return true if there are unsaved changes on the spreadsheet.
      */
     public boolean isDirty() {
         return _spreadsheet != null && _spreadsheet.isDirty();

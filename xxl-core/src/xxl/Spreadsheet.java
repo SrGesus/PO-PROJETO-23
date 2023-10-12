@@ -55,6 +55,7 @@ public class Spreadsheet implements Serializable {
      */
     void clean() {
         _dirty = false;
+        _cellStore.cleanUp();
     }
 
     /**
@@ -87,8 +88,8 @@ public class Spreadsheet implements Serializable {
      * @return 
      * @throws InvalidRangeException
      */
-    public Collection<String> showGama(String rangeSpecification) throws InvalidRangeException {
-        return getGama(rangeSpecification).toStrings();
+    public Iterable<String> showGama(String rangeSpecification) throws InvalidRangeException {
+        return getGama(rangeSpecification).iterStrings();
     }
 
     /**
@@ -98,7 +99,10 @@ public class Spreadsheet implements Serializable {
      */
     public void insertContents(String rangeSpecification, String contentSpecification) throws UnrecognizedEntryException, FunctionNameException {
         try {
-            _cellStore.insertExpression(rangeSpecification, contentSpecification);
+            if (contentSpecification.isBlank())
+                _cellStore.deleteGama(rangeSpecification);
+            else
+                _cellStore.insertExpression(rangeSpecification, contentSpecification);
             dirty();
         } catch (InvalidExpressionException e) {
             throw new UnrecognizedEntryException(e.getExpression());

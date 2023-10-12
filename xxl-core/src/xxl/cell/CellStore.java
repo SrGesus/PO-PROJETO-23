@@ -43,15 +43,50 @@ public abstract class CellStore implements Serializable {
     }
 
     /**
+     * Getter for the cell that will create new emtpy cell 
+     * if it doesn't exist at the address.
      * @param address of the Cell
      * @return the Cell
+     * @throws InvalidAddressException
      */
     public abstract Cell getCell(Address address) throws InvalidAddressException;
 
     /**
-     * 
+     * If the Cell is not in the store, an empty Cell unnattached to the store is returned.
+     * @param address
+     * @throws InvalidAddressException
+     */
+    public abstract Cell getCellReadOnly(Address address) throws InvalidAddressException;
+
+    /**
+     * Removes Cell from the store if it is not being observed.
+     * @param address
+     * @throws InvalidAddressException
+     */
+    public void deleteCell(Address address) throws InvalidAddressException {
+        try {
+            getCellReadOnly(address).updateExpression(this, "");
+        } catch (FunctionNameException | InvalidExpressionException e) {
+            /* Unreachable */
+        }
+        deleteEmptyCell(address);
+    }
+
+    /**
+     * Removes Cell from the store if it is already empty,
+     * and without observers.
+     * @param address
+     */
+    protected abstract void deleteEmptyCell(Address address);
+
+    /**
+     * Cleans up memory before saving
+     */
+    public abstract void cleanUp();
+
+    /**
      * @param addressSpecification ::= LINHA;COLUNA
-     * @return
+     * @return the Cell at the given address specification.
      * @throws InvalidAddressException
      */
     public Cell getCell(String addressSpecification) throws InvalidAddressException {
@@ -59,9 +94,8 @@ public abstract class CellStore implements Serializable {
     }
 
     /**
-     * 
      * @param rangeSpecification
-     * @return
+     * @return the Range of the given specification.
      * @throws InvalidRangeException
      */
     public Range getRange(String rangeSpecification) throws InvalidRangeException {
@@ -69,7 +103,9 @@ public abstract class CellStore implements Serializable {
     }
 
     /**
+     * getRange but works for single cells.
      * @param gamaSpecification ::= LINHA;COLUNA:LINHA;COLUNA | LINHA;COLUNA
+     * @return the Range of the given specification.
      * @throws InvalidRangeException
      */
     public Range getGama(String gamaSpecification) throws InvalidRangeException {
@@ -86,16 +122,26 @@ public abstract class CellStore implements Serializable {
 
     /**
      * Inserts and evaluates a given expression into a Cell of the store.
-     * @param rangeSpecification ::= LINHA;COLUNA:LINHA;COLUNA | LINHA;COLUNA
+     * @param gamaSpecification ::= LINHA;COLUNA:LINHA;COLUNA | LINHA;COLUNA
      * @param expression
      * @throws FunctionNameException
      * @throws InvalidExpressionException
      */
-    public void insertExpression(String rangeSpecification, String expression) throws FunctionNameException, InvalidExpressionException {
-        Range range = getGama(rangeSpecification);
-        while (range.hasNext()) {
-            range.next().updateExpression(this, expression, true);
+    public void insertExpression(String gamaSpecification, String expression) throws FunctionNameException, InvalidExpressionException {
+        Range range = getGama(gamaSpecification);
+        for (Cell cell : range.iterCells()) {
+            cell.updateExpression(this, expression, true);
         }
+    }
+
+    /**
+     * Deletes a given range of Cells from the store.
+     * @param gamaSpecification ::= LINHA;COLUNA:LINHA;COLUNA | LINHA;COLUNA
+     * @throws InvalidRangeException
+     */
+    public void deleteGama(String gamaSpecification) throws InvalidRangeException {
+        Range range = getGama(gamaSpecification);
+        range.iterAddresses().forEach(address -> deleteEmptyCell(address));
     }
 
     /**

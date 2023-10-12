@@ -223,6 +223,15 @@ public class Cell implements Serializable {
         return cell;
     }
 
+    /**
+     * @return true if Cell has no content and is not being observed.
+     */
+    public boolean isDeletable() {
+        return _content instanceof NullContent &&
+            _function == null &&
+            (_observers == null || _observers.isEmpty());
+    }
+
     /** @see Object#toString() */
     @Override
     public String toString() {
