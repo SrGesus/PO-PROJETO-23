@@ -6,7 +6,8 @@ package xxl.cell;
  */
 public class CutBuffer{
 
-    CellStore _buffer;
+    /** The Cells of the buffer */
+    private CellStore _buffer;
 
     /**
      * Constructor

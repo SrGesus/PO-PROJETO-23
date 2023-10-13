@@ -2,9 +2,9 @@ package xxl.app.edit;
 
 import pt.tecnico.uilib.menus.Command;
 import pt.tecnico.uilib.menus.CommandException;
+
 import xxl.Spreadsheet;
 import xxl.exceptions.FunctionNameException;
-// FIXME import classes
 import xxl.exceptions.UnrecognizedEntryException;
 
 /**
