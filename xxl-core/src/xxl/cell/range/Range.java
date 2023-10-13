@@ -22,7 +22,7 @@ public class Range {
     private Address _endAddress;
 
     /** The grid of cells */
-    CellStore _store;
+    private CellStore _store;
 
     /**
      * Constructor for Cell Iterator.
