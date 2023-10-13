@@ -1,4 +1,4 @@
-package xxl;
+package xxl.user;
 
 import java.io.Serializable;
 import java.util.List;

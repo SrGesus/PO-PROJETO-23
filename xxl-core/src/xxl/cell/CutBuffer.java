@@ -6,11 +6,7 @@ package xxl.cell;
  */
 public class CutBuffer{
 
-    int _lines;
-
-    int _columns;
-
-    CellStore _buffer = new CellStoreArray(_lines, _columns);
+    CellStore _buffer;
 
     /**
      * Constructor
@@ -18,8 +14,7 @@ public class CutBuffer{
      * @param columns
      */
     CutBuffer(int lines, int columns){
-        _lines = lines;
-        _columns = columns;
+        _buffer = new CellStoreArray(lines, columns);
     }
 
 

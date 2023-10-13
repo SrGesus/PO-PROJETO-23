@@ -8,8 +8,10 @@ import java.util.Set;
 import xxl.cell.Cell;
 import xxl.cell.CellStore;
 import xxl.cell.CellStoreArray;
-import xxl.cell.Range;
+import xxl.cell.range.Range;
 import xxl.exceptions.*;
+import xxl.user.DataStore;
+import xxl.user.User;
 
 /**
  * Class representing a spreadsheet.

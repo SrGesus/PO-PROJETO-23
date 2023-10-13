@@ -5,7 +5,7 @@ import xxl.exceptions.InvalidAddressException;
 /**
  * Represents an address in the spreadsheet that corresponds to a single cell.
  */
-class Address {
+public class Address {
     /** The line of this address */
     private int _line;
 
