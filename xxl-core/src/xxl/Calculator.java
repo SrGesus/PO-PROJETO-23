@@ -14,6 +14,7 @@ import xxl.exceptions.ImportFileException;
 import xxl.exceptions.MissingFileAssociationException;
 import xxl.exceptions.UnavailableFileException;
 import xxl.exceptions.UnrecognizedEntryException;
+import xxl.user.DataStore;
 
 /**
  * Class representing a spreadsheet application.

@@ -6,7 +6,7 @@ import java.util.HashMap;
 
 import xxl.cell.Cell;
 import xxl.cell.CellStore;
-import xxl.cell.Range;
+import xxl.cell.range.Range;
 import xxl.cell.CellObserver;
 import xxl.content.Content;
 import xxl.content.ErrorContent;

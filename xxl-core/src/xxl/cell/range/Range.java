@@ -1,10 +1,14 @@
-package xxl.cell;
+package xxl.cell.range;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
+import xxl.cell.Address;
+import xxl.cell.Cell;
+import xxl.cell.CellStore;
 import xxl.exceptions.InvalidAddressException;
 import xxl.exceptions.InvalidRangeException;
+
 
 /**
  * Class that represents a Range of Cells.
@@ -25,7 +29,7 @@ public class Range {
      * @param rangeSpecification ::= LINHA;COLUNA:LINHA;COLUNA
      * @throws InvalidRangeException
      */
-    Range(CellStore store, String rangeSpecification) throws InvalidRangeException {
+    public Range(CellStore store, String rangeSpecification) throws InvalidRangeException {
         try {
             /** Parsing of rangeSpecification */
             String[] range = rangeSpecification.split(":");
@@ -78,7 +82,7 @@ public class Range {
             /** @see java.util.Iterable#iterator() */
             @Override
             public Iterator<String> iterator() {
-                return new StringIterator();
+                return new StringIterator(Range.this);
             }
         };
     }
@@ -92,7 +96,7 @@ public class Range {
             /** @see java.util.Iterable#iterator() */
             @Override
             public Iterator<Cell> iterator() {
-                return new CellIterator();
+                return new CellIterator(Range.this);
             }
         };
     }
@@ -106,7 +110,7 @@ public class Range {
             /** @see java.util.Iterable#iterator() */
             @Override
             public Iterator<Cell> iterator() {
-                return new CellReadOnlyIterator();
+                return new CellReadOnlyIterator(Range.this);
             }
         };
     }
@@ -119,70 +123,16 @@ public class Range {
             /** @see java.util.Iterable#iterator() */
             @Override
             public Iterator<Address> iterator() {
-                return new AddressIterator();
+                return new AddressIterator(Range.this);
             }
         };
-    }
-
-    /**
-     * An Iterator that iterates over Cells in the store.
-     * Use when the Cell is to be changed or added observers.
-     */
-    private class CellIterator extends CellReadOnlyIterator {
-        /** @see RangeIterator#getNextCell() */
-        @Override
-        public Cell getNextCell() throws InvalidAddressException {
-            return _store.getCell(getCurrentAddress());
-        }
-    }
-
-    /**
-     * An Iterator that iterates over Cells.
-     * Use when they're not going to be changed.
-     */
-    private class CellReadOnlyIterator extends RangeIterator<Cell> {
-        /** @see RangeIterator#getResult(Cell) */
-        @Override
-        public Cell getResult(Cell c) {
-            return c;
-        }
-    }
-
-    /**
-     * An Iterator that iterates over the string that represents each cell (with their address).
-     */
-    private class StringIterator extends RangeIterator<String> {
-        /** @see RangeIterator#getResult(Cell) */
-        @Override
-        public String getResult(Cell cell) {
-            return getCurrentAddress() + "|" + cell;
-        }
-    }
-
-    /**
-     * An Iterator that iterates over the addresses of the cells.
-     */
-    private class AddressIterator extends RangeIterator<Address> {
-
-        /** @see RangeIterator#getResult(Cell) */
-        @Override
-        protected Address getResult(Cell cell) {
-            return getCurrentAddress();
-        }
-
-        /** @see RangeIterator#getNextCell() */
-        @Override
-        protected Cell getNextCell() {
-            /** For efficiency don't lookup cell */
-            return null;
-        }
     }
 
     /**
      * An abstract iterator that iterates over a range of cells.
      * @param T the type of what it is iterating over.
      */
-    private abstract class RangeIterator<T> implements Iterator<T> {
+    public abstract class RangeIterator<T> implements Iterator<T> {
 
         /** The current Address of this Range */
         private Address _currentAddress = _startAddress;
@@ -192,6 +142,13 @@ public class Range {
          */
         public Address getCurrentAddress() {
             return _currentAddress;
+        }
+
+        /**
+         * @return the store of this Range.
+         */
+        public CellStore getStore() {
+            return _store;
         }
 
         /**

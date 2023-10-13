@@ -2,6 +2,7 @@ package xxl.cell;
 
 import java.io.Serializable;
 
+import xxl.cell.range.Range;
 import xxl.exceptions.FunctionNameException;
 import xxl.exceptions.InvalidAddressException;
 import xxl.exceptions.InvalidExpressionException;

@@ -1,4 +1,4 @@
-package xxl;
+package xxl.user;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -22,7 +22,15 @@ public class DataStore implements Serializable {
     }
 
     /**
-     * 
+     * Creates a new user.
+     * @param name
+     */
+    public void newUser(String name) {
+        _users.put(name, new User(name));
+    }
+
+    /**
+     * Adds a spreadsheet to a user
      * @param filename
      */
     public void addSpreadsheet(String filename, String user) {
@@ -30,7 +38,6 @@ public class DataStore implements Serializable {
         if (spreadsheet == null) _spreadsheetUsers.put(filename, new ArrayList<User>());
         
     }
-
 
     public void renameSpreadsheet(String oldFilename, String newFilename) {
         for (User user : _spreadsheetUsers.get(oldFilename)) {
