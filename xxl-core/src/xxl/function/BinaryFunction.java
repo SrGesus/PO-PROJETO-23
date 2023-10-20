@@ -33,7 +33,7 @@ public abstract class BinaryFunction extends Function {
      * @see Function#compute()
      */
     @Override
-    protected Literal compute() {
+    protected final Literal compute() {
         try {
             return new IntLiteral(result(getArg(0).getInt(), getArg(1).getInt()));
         } catch (UnexpectedContentException | ArithmeticException e) {
