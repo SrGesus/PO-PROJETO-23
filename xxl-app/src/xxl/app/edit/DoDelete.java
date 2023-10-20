@@ -5,6 +5,7 @@ import pt.tecnico.uilib.menus.CommandException;
 
 import xxl.Spreadsheet;
 import xxl.exceptions.FunctionNameException;
+import xxl.exceptions.InvalidRangeException;
 import xxl.exceptions.UnrecognizedEntryException;
 
 /**
@@ -20,12 +21,9 @@ class DoDelete extends Command<Spreadsheet> {
     @Override
     protected final void execute() throws CommandException {
         try {
-            _receiver.insertContents(stringField("gama"), "");
-        } catch (UnrecognizedEntryException e) {
-            throw new InvalidCellRangeException(e.getEntrySpecification());
-        } catch (FunctionNameException e) {
-            /** Unreachable */
-            throw new UnknownFunctionException(e.getFunctionName());
+            _receiver.deleteGama(stringField("gama"));
+        } catch (InvalidRangeException e) {
+            throw new InvalidCellRangeException(e.getExpression());
         }
     }
 

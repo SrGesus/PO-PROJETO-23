@@ -9,7 +9,13 @@ import xxl.cell.Cell;
 import xxl.cell.CellStore;
 import xxl.cell.CellStoreArray;
 import xxl.cell.range.Range;
+import xxl.content.CellReference;
+import xxl.content.Content;
+import xxl.content.literal.ErrorLiteral;
+import xxl.content.literal.IntLiteral;
+import xxl.content.literal.StringLiteral;
 import xxl.exceptions.*;
+import xxl.function.*;
 import xxl.user.DataStore;
 import xxl.user.User;
 
@@ -65,21 +71,65 @@ public class Spreadsheet implements Serializable {
     }
 
     /**
-     * @param addressExpression ::= LINHA;COLUNA
-     * @return the Cell
-     * @throws InvalidAddressException when not able to parse address.
+     * Parses an expression String into a Content.
+     * @param expression
+     * @param checkEqual whether to check for an equals sign at the beginning of the expression
+     * @return
+     * @throws FunctionNameException
      */
-    public Cell getCell(String addressExpression) throws InvalidAddressException {
-        return _cellStore.getCell(addressExpression);
+    public Content parseContent(String expression, boolean checkEqual) throws FunctionNameException {
+        if (expression.isBlank()) return null;
+        /* Try String */
+        try {
+            return new StringLiteral(expression);
+        } catch (InvalidExpressionException e) {}
+        /* Try Int */
+        try {
+            return new IntLiteral(expression);
+        } catch (InvalidExpressionException e) {}
+        /* Consume equals */
+        if (checkEqual) {
+            if (expression.charAt(0) != '=') return new ErrorLiteral();
+            expression = expression.substring(1);
+        }
+        /* Try reference to Cell */
+        try {
+            return new CellReference(_cellStore, expression);
+        } catch (InvalidExpressionException e) {}
+        /* Try function */
+        try {
+            /** The name of the function is everything until '(' */
+            String functionName = expression.substring(0, expression.indexOf('('));
+            /** Array of what is inbetween commas and inside the outermost parentheses */
+            String[] functionArgs = expression.substring(expression.indexOf('(')+1, expression.lastIndexOf(')')).split(",+(?![^\\(]*\\))");
+            return switch(functionName) {
+                case "ADD" -> new ADD(this, functionArgs);
+                case "DIV" -> new DIV(this, functionArgs);
+                case "MUL" -> new MUL(this, functionArgs);
+                case "SUB" -> new SUB(this, functionArgs);
+                default -> throw new FunctionNameException(functionName);
+            };
+        } catch (IndexOutOfBoundsException| FunctionArgException e) {}
+        return new ErrorLiteral();
     }
 
+    
     /**
-     * @param rangeSpecification ::= LINHA;COLUNA:LINHA;COLUNA | LINHA;COLUNA
-     * @return an iterator over the cells in the specified range.
+     * getRange but works for single cells.
+     * @param gamaSpecification ::= LINHA;COLUNA:LINHA;COLUNA | LINHA;COLUNA
+     * @return the Range of the given specification.
      * @throws InvalidRangeException
      */
-    public Range getGama(String rangeSpecification) throws InvalidRangeException {
-        return _cellStore.getGama(rangeSpecification);
+    public Range getGama(String gamaSpecification) throws InvalidRangeException {
+        try {
+            return _cellStore.getRange(gamaSpecification);
+        } catch (InvalidRangeException e) {
+            try {
+                return _cellStore.getRange(gamaSpecification + ":" + gamaSpecification);
+            } catch (InvalidRangeException e2) {
+                throw e;
+            }
+        }
     }
 
     /**
@@ -92,19 +142,48 @@ public class Spreadsheet implements Serializable {
     }
 
     /**
+     * Deletes the contents of the given gama.
+     * @param rangeSpecification
+     * @throws InvalidRangeException
+     */
+    public void deleteGama(String rangeSpecification) throws InvalidRangeException {
+        getGama(rangeSpecification).iterAddresses().forEach(addr -> {
+            try {_cellStore.deleteCell(addr);
+            } catch (InvalidAddressException e) { /* Logically Unreachable */}
+        } );
+        dirty();
+    }
+
+    /**
+     * Inserts content into gama.
+     * @param gamaSpecification
+     */
+    public void insertGama(String gamaSpecification, String contentSpecification) throws InvalidExpressionException, FunctionNameException {
+        Content content = parseContent(contentSpecification, true);
+        getGama(gamaSpecification).iterAddresses().forEach(addr -> {
+            try {_cellStore.getCell(addr).setContent(content);
+            } catch (InvalidAddressException e) { /* Logically Unreachable */}
+        } );
+        dirty();
+    }
+
+    /**
      * Insert specified content in specified range.
-     * @param rangeSpecification ::= LINHA;COLUNA:LINHA;COLUNA | LINHA;COLUNA
+     * @param gamaSpecification ::= LINHA;COLUNA:LINHA;COLUNA | LINHA;COLUNA
      * @param contentSpecification an expression
      */
-    public void insertContents(String rangeSpecification, String contentSpecification) throws UnrecognizedEntryException, FunctionNameException {
+    public void insertContents(String gamaSpecification, String contentSpecification) throws UnrecognizedEntryException {
         try {
             if (contentSpecification.isBlank())
-                _cellStore.deleteGama(rangeSpecification);
-            else
-                _cellStore.insertExpression(rangeSpecification, contentSpecification);
+                deleteGama(gamaSpecification);
+            else 
+                insertGama(gamaSpecification, contentSpecification);
             dirty();
         } catch (InvalidExpressionException e) {
             throw new UnrecognizedEntryException(e.getExpression());
+        } catch (FunctionNameException e) {
+            /* Guaranteed to be Unreachable */
+            throw new UnrecognizedEntryException(contentSpecification);
         }
     }
 

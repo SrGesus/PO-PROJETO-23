@@ -2,26 +2,42 @@ package xxl.content;
 
 import java.io.Serializable;
 
+import xxl.content.literal.Literal;
 import xxl.exceptions.UnexpectedContentException;
+import xxl.observer.Observable;
 
 /**
- * Class representing a value.
+ * Class representing the contents of a cell.
  */
-public abstract class Content implements Serializable {
+public abstract class Content implements Serializable, Observable {
 
     /**
-     * @return the string content if it is a string
-     * @throws UnexpectedContentException if content is not a string.
+     * @return The String value of this content.
+     * @throws UnexpectedContentException if the content has no String.
+    */
+    public String getString() throws UnexpectedContentException {
+        return value().getString();
+    }
+
+    /** 
+     * @return The Int value of this content.
+     * @throws UnexpectedContentException if the content has no Int.
      */
-    public abstract String getString() throws UnexpectedContentException;
+    public int getInt() throws UnexpectedContentException {
+        return value().getInt();
+    }
 
     /**
-     * @return the integer content if it is an integer.
-     * @throws UnexpectedContentException if content is not an integer.
+     * @return the Literal value of this content.
      */
-    public abstract int getInt() throws UnexpectedContentException;
+    public abstract Literal value();
 
     /** Force the re-implementation of toString */
     @Override
     public abstract String toString();
+
+    /** 
+     * @see Observer#close() 
+     */
+    public abstract void close();
 }

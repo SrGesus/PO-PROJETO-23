@@ -1,241 +1,148 @@
 package xxl.cell;
 
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
-import xxl.function.*;
-import xxl.content.*;
-import xxl.exceptions.FunctionArgException;
+import xxl.Spreadsheet;
+import xxl.content.Content;
+import xxl.content.literal.ErrorLiteral;
+import xxl.content.literal.Literal;
 import xxl.exceptions.FunctionNameException;
-import xxl.exceptions.InvalidAddressException;
-import xxl.exceptions.InvalidExpressionException;
+import xxl.observer.Observable;
+import xxl.observer.Observer;
 
 /**
  * Class that represents a Cell of a Spreadsheet.
  * All functions that alter the state of a Cell are package-private.
  */
-public class Cell implements Serializable {
-
-    /** 
-     * The expression inside this Cell 
-     * @see xxl.cell.Cell#setExpression(String)
-     */
-    private String _expression = "";
+public class Cell implements Serializable, Observable, Observer {
 
     /** The content of this Cell */
-    private Content _content = new NullContent();
+    private Content _content = null;
 
-    /** Function that the expression of the Cell represents */
-    private FunctionStrategy _function = null;
-
-    /** True if content might have to be recalculated. */
-    private boolean dirty = false;
-
-    /** A Collection of the observers of this Cell that need to be notified. */
-    private Set<CellObserver> _observers = null;
-
-    /**
-     * Package-private constructor.
-     */
-    Cell() {}
-
-    /** Mark Cell's content as outdated. */
-    void dirty() {
-        dirty = true;
-    }
-
-    /**
-     * Retrieves the content, and recalculates it if dirty.
-     * @return The content of this cell
-     */
-    public Content getContent() {
-        if (dirty) updateContent();
-        return _content;
-    }
-
-    /**
-     * @return The expression of this cell
-     */
-    public String getExpression() {
-        return _expression;
-    }
-
-    /**
-     * @return The name of the function in this cell.
-     */
-    public String getFunctionName() {
-        if (_function == null) return "";
-        return _function.getClass().getSimpleName();
-    }
-
-    /**
-     * Recalculates the content of this cell.
-    */
-    void updateContent() {
-        if (_function != null) {
-            _content = _function.getOutput();
-        }
-        notifyObservers();
-        dirty = false;
-    }
-
-    /**
-     * Changes the expression of this Cell.
-     * Run this method instead of setting the expression directly.
-     * Will remove current function.
-     * @param expression to be changed
-     */
-    private void setExpression(String expression) {
-        if (_function != null) {
-            _function.cleanFunction();
-            _function = null;
-        }
-        notifyObservers();
-        _expression = expression;
-    }
-
-    /**
-     * Sets and parses the expression of this Cell.
-     * @param store the CellStore this Cell is in.
-     * @param expression to be evaluated.
-     */
-    void updateExpression(CellStore store, String expression) throws FunctionNameException, InvalidExpressionException {
-        updateExpression(store, expression, false);
-    }
-
-    /**
-     * Sets and parses the expression of this Cell.
-     * @param store the CellStore this Cell is in.
-     * @param expression to be evaluated.
-     * @param checkEqual if true, will check if there is an equal sign if the expression is not a literal.
-     */
-    void updateExpression(CellStore store, String expression, boolean checkEqual) throws FunctionNameException, InvalidExpressionException {
-        /* Try empty expression */
-        if (expression.isBlank()) {
-            _content = new NullContent();
-            setExpression(expression);
-            return;
-        }
-        /* Try String literal */
-        try {
-            _content = new StringContent(expression);
-            setExpression(expression);
-            return;
-        } catch (InvalidExpressionException e) {
-            /* Not a String */
-        }
-        /* Try Integer literal */
-        try {
-            _content = new IntContent(expression);
-            setExpression(expression);
-            return;
-        } catch (InvalidExpressionException e) {
-            /* Not an integer. */
-        }
-        /*  */
-        if (checkEqual) {
-            if (expression.charAt(0) != '=') throw new InvalidExpressionException(expression);
-            expression = expression.substring(1);
-        }
-        /* Try to evaluate a Reference */
-        try {
-            store.getCell(expression);
-            setExpression(expression);
-            _function = new ReferenceCell(store, this, expression);
-            dirty();
-            return;
-        } catch (InvalidAddressException e) {
-            /* Not a reference. */
-        } catch (FunctionArgException e) {
-            /* Unreachable */
-        }
-        /* Try to evaluate a Function */
-        try {
-            /** The name of the function is everything until '(' */
-            String functionName = expression.substring(0, expression.indexOf('('));
-            /** Array of what is inbetween commas and inside the outermost parentheses */
-            String[] functionArgs = expression.substring(expression.indexOf('(')+1, expression.lastIndexOf(')')).split(",+(?![^\\(]*\\))");
-            FunctionStrategy newFunction = switch (functionName) {
-                case "ADD" -> new ADD(store, this, functionArgs);
-                case "SUB" -> new SUB(store, this, functionArgs);
-                case "MUL" -> new MUL(store, this, functionArgs);
-                case "DIV" -> new DIV(store, this, functionArgs);
-                default -> throw new FunctionNameException(functionName);
-            };
-            setExpression(expression);
-            _function = newFunction;
-            dirty();
-            return;
-        } catch (IndexOutOfBoundsException | FunctionArgException e) {}
-        /* Not properly formulated expression */
-        throw new InvalidExpressionException(expression);
-    }
+    /* Observers of this Content */
+    private List<Observer> _observers = new ArrayList<Observer>();
     
     /**
-     * Starts notifying given observer.
-     * @param cellObserver to be attached.
+     * Constructor for empty Cell.
      */
-    public void attach(CellObserver cellObserver) {
-        if (_observers == null) _observers = new HashSet<CellObserver>();
-        _observers.add(cellObserver);
+    public Cell() {
     }
 
     /**
-     * Stops notifying given observer.
-     * @param cellObserver to be removed.
+     * Setter for content.
+     * @param content
      */
-    void detach(CellObserver cellObserver) {
-        _observers.remove(cellObserver);
+    public void setContent(Content content) {
+        close();
+        _content = content;
+        content.attach(this);
+        notifyObservers();
     }
 
     /**
-     * Notify observers that value has been changed.
+     * @return the value of the content of this Cell.
      */
-    private void notifyObservers() {
-        if (_observers == null) return;
-        for (CellObserver cellObserver : _observers) {
-            cellObserver.update();
-        }
+    public Literal value() {
+        if (_content == null) return new ErrorLiteral();
+        return _content.value();
     }
 
     /**
-     * Copy the expression of given Cell to this Cell.
-     * @param store the CellStore this Cell is in.
-     * @param cell the Cell to be pasted into this one.
+     * Creates a copy of this Cell.
+     * @param spreadsheet
+     * @return the Cell's copy
      */
-    public void paste(CellStore store, Cell cell) {
+    public Cell copy(Spreadsheet spreadsheet) {
+        return new Cell().paste(spreadsheet, this);
+    }
+
+    /**
+     * @param spreadsheet
+     * @param origin Cell to copy from
+     * @return this Cell (destination)
+     */
+    public Cell paste(Spreadsheet spreadsheet, Cell origin) {
         try {
-            updateExpression(store, cell._expression, true);
-        } catch (InvalidExpressionException | FunctionNameException e) {
-            /** Unreachable */
+            setContent(spreadsheet.parseContent(origin._content != null ? origin._content.toString() : "", false));
+        } catch (FunctionNameException e) {
+            /* Logically Unreachable */
+            e.printStackTrace();
+        }
+        return this;
+    }
+
+    /**
+     * @param observer to attach
+     * @see Observable#attach(Observer)
+     */
+    @Override
+    public final void attach(Observer observer) {
+        _observers.add(observer);
+    }
+
+    /**
+     * @param observer to detach
+     * @see Observable#detach(Observer)
+     */
+    @Override
+    public void detach(Observer observer) {
+        _observers.remove(observer);
+    }
+
+    /**
+     * @see Observable#notifyObservers()
+     */
+    @Override
+    public void notifyObservers() {
+        for (Observer observer : _observers) {
+            observer.update();
         }
     }
 
     /**
-     * Copy the expression of this Cell to another Cell.
-     * @param store the CellStore this Cell is in
-     * @return a copy of this Cell
+     * @see Observer#update()
      */
-    public Cell copy(CellStore store) {
-        Cell cell = new Cell();
-        cell.setExpression(cell._expression);
-        return cell;
+    @Override
+    public void update() {
+        notifyObservers();
     }
 
     /**
-     * @return true if Cell has no content and is not being observed.
+     * @return true if this Cell is empty and has no Observers.
      */
     public boolean isDeletable() {
-        return _content instanceof NullContent &&
-            _function == null &&
-            (_observers == null || _observers.isEmpty());
+        return isEmpty() && _observers.isEmpty();
+    }
+
+    /**
+     * @return true if this Cell has a null content
+     */
+    public boolean isEmpty() {
+        return _content == null;
+    }
+
+    /**
+     * @return true if this Cell has a Literal content
+     */
+    public boolean isLiteral() {
+        return _content == value();
     }
 
     /** @see Object#toString() */
     @Override
     public String toString() {
-        if (getContent() instanceof NullContent) return "";
-        return getContent() + (_function != null ? "=" + _expression : "");
+        if (isEmpty()) return "";
+        if (isLiteral()) {
+            return _content.toString();
+        } else {
+            return value().toString() + "=" + _content.toString();
+        }
+    }
+
+    /** @see Observer#close() */
+    public void close() {
+        if (_content != null) _content.close();
     }
 }

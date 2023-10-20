@@ -1,11 +1,13 @@
 package xxl.cell;
 
+import java.io.Serializable;
+
 import xxl.exceptions.InvalidAddressException;
 
 /**
  * Represents an address in the spreadsheet that corresponds to a single cell.
  */
-public class Address {
+public class Address implements Serializable {
     /** The line of this address */
     private int _line;
 
@@ -78,14 +80,5 @@ public class Address {
     @Override
     public String toString() {
         return (_line + 1) + ";" + (_column + 1);
-    }
-
-    /** @see Object#equals(Object) */
-    @Override
-    public boolean equals(Object o) {
-        if (o instanceof Address a) {
-            return _line == a.getLine() && _column == a.getColumn();
-        }
-        return false;
     }
 }

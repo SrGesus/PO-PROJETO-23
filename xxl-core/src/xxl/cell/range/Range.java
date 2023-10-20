@@ -81,7 +81,7 @@ public class Range {
         return new Iterable<String>() {
             /** @see java.util.Iterable#iterator() */
             @Override
-            public Iterator<String> iterator() {
+            public RangeIterator<String> iterator() {
                 return new StringIterator(Range.this);
             }
         };
@@ -95,7 +95,7 @@ public class Range {
         return new Iterable<Cell>() {
             /** @see java.util.Iterable#iterator() */
             @Override
-            public Iterator<Cell> iterator() {
+            public RangeIterator<Cell> iterator() {
                 return new CellIterator(Range.this);
             }
         };
@@ -109,7 +109,7 @@ public class Range {
         return new Iterable<Cell>() {
             /** @see java.util.Iterable#iterator() */
             @Override
-            public Iterator<Cell> iterator() {
+            public RangeIterator<Cell> iterator() {
                 return new CellReadOnlyIterator(Range.this);
             }
         };
@@ -122,7 +122,7 @@ public class Range {
         return new Iterable<Address>() {
             /** @see java.util.Iterable#iterator() */
             @Override
-            public Iterator<Address> iterator() {
+            public RangeIterator<Address> iterator() {
                 return new AddressIterator(Range.this);
             }
         };
@@ -194,6 +194,11 @@ public class Range {
             return _currentAddress.getLine() <= _endAddress.getLine() &&
                    _currentAddress.getColumn() <= _endAddress.getColumn();
         }
+    }
+
+    @Override
+    public String toString() {
+        return _startAddress + ":" + _endAddress;
     }
 
 }

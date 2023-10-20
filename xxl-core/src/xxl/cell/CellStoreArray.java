@@ -39,7 +39,7 @@ public class CellStoreArray extends CellStore {
         } catch (IndexOutOfBoundsException e) {
             throw new InvalidAddressException(address.toString());
         }
-    };
+    }
 
     /**
      * If the Cell is not in the store, an empty Cell unnattached to the store is returned.
@@ -59,7 +59,7 @@ public class CellStoreArray extends CellStore {
         } catch (IndexOutOfBoundsException e) {
             throw new InvalidAddressException(address.toString());
         }
-    };
+    }
 
     /**
      * Removes Cell from the store if it is empty,
@@ -78,7 +78,7 @@ public class CellStoreArray extends CellStore {
         } catch (IndexOutOfBoundsException e) {
             return;
         }
-    };
+    }
 
     /** 
      * Will remove all empty lines from the store.
