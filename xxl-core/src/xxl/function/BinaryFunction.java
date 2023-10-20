@@ -1,7 +1,6 @@
 package xxl.function;
 
 import xxl.Spreadsheet;
-import xxl.cell.CellStore;
 import xxl.content.Content;
 import xxl.content.literal.ErrorLiteral;
 import xxl.content.literal.IntLiteral;

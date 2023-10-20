@@ -5,7 +5,6 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
-import xxl.cell.Cell;
 import xxl.cell.CellStore;
 import xxl.cell.CellStoreArray;
 import xxl.cell.range.Range;
