@@ -9,7 +9,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 
-import xxl.exceptions.FunctionNameException;
 import xxl.exceptions.ImportFileException;
 import xxl.exceptions.MissingFileAssociationException;
 import xxl.exceptions.UnavailableFileException;

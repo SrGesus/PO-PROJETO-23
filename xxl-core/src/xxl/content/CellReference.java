@@ -14,10 +14,10 @@ import xxl.observer.Observer;
 public class CellReference extends ObservableContent implements Observer {
 
     /** The address of the referenced Cell. */
-    Address _address;
+    private Address _address;
 
     /** Referenced Cell. */
-    Cell _cell;
+    private Cell _cell;
 
     /**
      * Constructor for CellReference.
