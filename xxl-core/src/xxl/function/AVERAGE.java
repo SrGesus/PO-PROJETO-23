@@ -31,13 +31,9 @@ public class AVERAGE extends RangeFunction {
     protected int result() throws UnexpectedContentException{
         int result = 0;
         for (int i = 0; i < size(); i++) {
-            try {
-                result += getArg(i).getInt();
-            } catch (UnexpectedContentException e) { // FIXME: might want to throw more appropriate exception, not catch it
-                return 0;
-            }
+            result += getArg(i).getInt();
         }
-        return result; 
+        return result / size(); 
     }
 
 

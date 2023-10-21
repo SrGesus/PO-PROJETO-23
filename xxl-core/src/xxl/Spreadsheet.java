@@ -106,6 +106,7 @@ public class Spreadsheet implements Serializable {
                 case "DIV" -> new DIV(this, functionArgs);
                 case "MUL" -> new MUL(this, functionArgs);
                 case "SUB" -> new SUB(this, functionArgs);
+                case "AVERAGE" -> new AVERAGE(this, functionArgs);
                 default -> throw new FunctionNameException(functionName);
             };
         } catch (IndexOutOfBoundsException| FunctionArgException e) {}
