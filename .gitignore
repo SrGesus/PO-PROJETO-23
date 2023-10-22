@@ -5,3 +5,5 @@ po-uilib
 .gitignore
 backup
 saved*
+shell.nix
+Makefile
