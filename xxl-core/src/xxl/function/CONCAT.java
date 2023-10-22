@@ -30,13 +30,13 @@ public class CONCAT extends RangeFunction {
      */
     @Override
     protected StringLiteral result() throws UnexpectedContentException, InvalidExpressionException{
-        String result = "";
+        String result = "\'";
         for (int i = 0; i < size(); i++) {
             try {
                 result += getArg(i).getString();
             } 
             catch (UnexpectedContentException e) {
-                result += "";
+                // Do nothing
             }
         }
         return new StringLiteral(result);

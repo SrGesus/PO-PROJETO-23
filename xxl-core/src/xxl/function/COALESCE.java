@@ -30,17 +30,14 @@ public class COALESCE extends RangeFunction {
      */
     @Override
     protected StringLiteral result() throws UnexpectedContentException, InvalidExpressionException{
-        String result = "";
-        for (int i = 0, j = 0; i < size() && j != 1; i++) {
+        for (int i = 0; i < size(); i++) {
             try {
-                result += getArg(i).getString();
-                j = 1;
+                return new StringLiteral(getArg(i).getString()); 
             } 
             catch (UnexpectedContentException e) {
-                j = 0;
             }
         }
-        return new StringLiteral(result); 
+        return new StringLiteral("\'"); 
     }
 
  
