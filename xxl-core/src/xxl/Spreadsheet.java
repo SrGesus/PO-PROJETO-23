@@ -107,6 +107,8 @@ public class Spreadsheet implements Serializable {
                 case "MUL" -> new MUL(this, functionArgs);
                 case "SUB" -> new SUB(this, functionArgs);
                 case "AVERAGE" -> new AVERAGE(this, functionArgs);
+                case "CONCAT" -> new CONCAT(this, functionArgs);
+                case "COALESCE" -> new COALESCE(this, functionArgs);
                 default -> throw new FunctionNameException(functionName);
             };
         } catch (IndexOutOfBoundsException| FunctionArgException e) {}

@@ -4,14 +4,14 @@ import xxl.Spreadsheet;
 import xxl.cell.range.Range;
 import xxl.content.Content;
 import xxl.content.literal.ErrorLiteral;
-import xxl.content.literal.IntLiteral;
+import xxl.content.literal.StringLiteral;
 import xxl.content.literal.Literal;
 import xxl.exceptions.InvalidExpressionException;
 import xxl.exceptions.FunctionArgException;
 import xxl.exceptions.FunctionNameException;
 import xxl.exceptions.UnexpectedContentException;
 
-public class AVERAGE extends RangeFunction {
+public class CONCAT extends RangeFunction {
 
     /**
      * Constructor.
@@ -19,7 +19,7 @@ public class AVERAGE extends RangeFunction {
      * @param args
      * @throws FunctionArgException
      */
-    public AVERAGE(Spreadsheet spreadsheet, String[] args) throws FunctionArgException {
+    public CONCAT(Spreadsheet spreadsheet, String[] args) throws FunctionArgException {
         super(spreadsheet, args);
     }
 
@@ -29,12 +29,17 @@ public class AVERAGE extends RangeFunction {
      * @see BinaryFunction#result(int, int)
      */
     @Override
-    protected Literal result() throws UnexpectedContentException, InvalidExpressionException{
-        int result = 0;
+    protected StringLiteral result() throws UnexpectedContentException, InvalidExpressionException{
+        String result = "";
         for (int i = 0; i < size(); i++) {
-            result += getArg(i).getInt();
+            try {
+                result += getArg(i).getString();
+            } 
+            catch (UnexpectedContentException e) {
+                result += "";
+            }
         }
-        return new IntLiteral(result / size()); 
+        return new StringLiteral(result);
     }
 
 
@@ -44,6 +49,6 @@ public class AVERAGE extends RangeFunction {
      */
     @Override
     public String getName() {
-        return "AVERAGE";
+        return "CONCAT";
     }
 }

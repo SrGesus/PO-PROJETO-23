@@ -6,6 +6,7 @@ import xxl.content.Content;
 import xxl.content.literal.ErrorLiteral;
 import xxl.content.literal.IntLiteral;
 import xxl.content.literal.Literal;
+import xxl.exceptions.InvalidExpressionException;
 import xxl.exceptions.FunctionArgException;
 import xxl.exceptions.FunctionNameException;
 import xxl.exceptions.UnexpectedContentException;
@@ -28,8 +29,8 @@ public abstract class RangeFunction extends Function{
     @Override
     protected final Literal compute() {
         try {
-            return new IntLiteral(result());
-        } catch (UnexpectedContentException | ArithmeticException e) {
+            return result();
+        } catch (UnexpectedContentException | InvalidExpressionException | ArithmeticException e) {
             return new ErrorLiteral();
         }
     }
@@ -38,7 +39,7 @@ public abstract class RangeFunction extends Function{
      * Template method.
      * @return result of the function
      */
-    protected abstract int result() throws UnexpectedContentException;
+    protected abstract Literal result() throws UnexpectedContentException, InvalidExpressionException;
     
 
     /** @see Content#toString() */
