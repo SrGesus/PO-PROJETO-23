@@ -125,12 +125,12 @@ public class Spreadsheet implements Serializable {
      * @return the Range of the given specification.
      * @throws InvalidRangeException
      */
-    public Range getGama(String gamaSpecification) throws InvalidRangeException {
+    public Range getGama(String gamaSpecification, CellStore store) throws InvalidRangeException {
         try {
-            return _cellStore.getRange(gamaSpecification);
+            return store.getRange(gamaSpecification);
         } catch (InvalidRangeException e) {
             try {
-                return _cellStore.getRange(gamaSpecification + ":" + gamaSpecification);
+                return store.getRange(gamaSpecification + ":" + gamaSpecification);
             } catch (InvalidRangeException e2) {
                 throw e;
             }
@@ -143,7 +143,11 @@ public class Spreadsheet implements Serializable {
      * @throws InvalidRangeException
      */
     public Iterable<String> showGama(String rangeSpecification) throws InvalidRangeException {
-        return getGama(rangeSpecification).iterStrings();
+        return getGama(rangeSpecification, _cellStore).iterStrings();
+    }
+
+    public Iterable<String> showCutBuffer(String rangeSpecification) throws InvalidRangeException {
+        return getGama(rangeSpecification, _cutBuffer).iterStrings();
     }
 
     /**
@@ -152,7 +156,7 @@ public class Spreadsheet implements Serializable {
      * @throws InvalidRangeException
      */
     public void deleteGama(String rangeSpecification) throws InvalidRangeException {
-        getGama(rangeSpecification).iterAddresses().forEach(addr -> {
+        getGama(rangeSpecification, _cellStore).iterAddresses().forEach(addr -> {
             try {_cellStore.deleteCell(addr);
             } catch (InvalidAddressException e) { /* Logically Unreachable */}
         } );
@@ -165,7 +169,7 @@ public class Spreadsheet implements Serializable {
      */
     public void insertGama(String gamaSpecification, String contentSpecification) throws InvalidExpressionException, FunctionNameException {
         Content content = parseContent(contentSpecification, true);
-        getGama(gamaSpecification).iterAddresses().forEach(addr -> {
+        getGama(gamaSpecification, _cellStore).iterAddresses().forEach(addr -> {
             try {_cellStore.getCell(addr).setContent(content);
             } catch (InvalidAddressException e) { /* Logically Unreachable */}
         } );
@@ -217,7 +221,7 @@ public class Spreadsheet implements Serializable {
     }
 
     public void copy(String gamaSpecification) throws InvalidRangeException {
-        Range gama = getGama(gamaSpecification);
+        Range gama = getGama(gamaSpecification, _cellStore);
         _cutBuffer = new CellStoreArray(gama.getLines(), gama.getColumns());
         gama.iterAddresses().forEach(addr -> {
             try {
@@ -227,7 +231,7 @@ public class Spreadsheet implements Serializable {
     }
 
     public void paste(String gamaSpecification) throws InvalidRangeException {
-        Range gama = getGama(gamaSpecification);
+        Range gama = getGama(gamaSpecification, _cutBuffer);
         if (_cutBuffer == null) return;
         gama.iterAddresses().forEach(addr -> {
             try {
