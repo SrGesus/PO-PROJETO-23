@@ -25,14 +25,18 @@ public class COALESCE extends RangeFunction {
      */
     @Override
     protected StringLiteral result() throws UnexpectedContentException, InvalidExpressionException{
+        String result = "\'";
         for (int i = 0; i < size(); i++) {
             try {
-                return new StringLiteral(getArg(i).getString()); 
+                result += getArg(i).getString();
+                return new StringLiteral(result);
             } 
             catch (UnexpectedContentException e) {
+                System.out.println("RIPBOZO" + getArg(i).value());
             }
+            System.out.println("RIPBOZO " + result);
         }
-        return new StringLiteral("\'"); 
+        return new StringLiteral(result);
     }
 
  
