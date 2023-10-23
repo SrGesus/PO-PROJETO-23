@@ -26,6 +26,10 @@ public abstract class RangeFunction extends Function{
         }
     }
 
+    /**
+     * @return the result of the function
+     * @see Function#compute()
+     */
     @Override
     protected final Literal compute() {
         try {

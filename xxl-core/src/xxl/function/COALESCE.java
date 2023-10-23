@@ -21,7 +21,7 @@ public class COALESCE extends RangeFunction {
 
     /**
      * @return the result of the function
-     * @see BinaryFunction#result(int, int)
+     * @see RangeFunction#result()
      */
     @Override
     protected StringLiteral result() throws UnexpectedContentException, InvalidExpressionException{

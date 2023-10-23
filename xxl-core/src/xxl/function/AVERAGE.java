@@ -22,7 +22,7 @@ public class AVERAGE extends RangeFunction {
 
     /**
      * @return the result of the function
-     * @see RangeFunction#result(int, int)
+     * @see RangeFunction#result()
      */
     @Override
     protected Literal result() throws UnexpectedContentException, InvalidExpressionException{
