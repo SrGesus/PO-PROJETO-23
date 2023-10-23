@@ -5,6 +5,7 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
+import xxl.cell.Cell;
 import xxl.cell.CellStore;
 import xxl.cell.CellStoreArray;
 import xxl.cell.range.Range;
@@ -28,6 +29,8 @@ public class Spreadsheet implements Serializable {
 
     /** Flexible storage for Cells */
     private CellStore _cellStore;
+
+    private CellStore _cutBuffer=null;
 
     /** Set of user names */
     private Set<String> _users = null;
@@ -206,5 +209,31 @@ public class Spreadsheet implements Serializable {
     public void rename(DataStore store, String filename) {
         store.renameSpreadsheet(_filename, filename);
         _filename = filename;
+    }
+
+    public void cut(String gamaSpecification) throws InvalidRangeException {
+        copy(gamaSpecification);
+        deleteGama(gamaSpecification);
+    }
+
+    public void copy(String gamaSpecification) throws InvalidRangeException {
+        Range gama = getGama(gamaSpecification);
+        _cutBuffer = new CellStoreArray(gama.getLines(), gama.getColumns());
+        gama.iterAddresses().forEach(addr -> {
+            try {
+                _cutBuffer.getCell(addr).paste(this, _cellStore.getCell(addr).copy(this));
+            } catch (InvalidAddressException e) { /* Logically Unreachable */}
+        });
+    }
+
+    public void paste(String gamaSpecification) throws InvalidRangeException {
+        Range gama = getGama(gamaSpecification);
+        if (_cutBuffer == null) return;
+        gama.iterAddresses().forEach(addr -> {
+            try {
+                _cellStore.getCell(addr).paste(this, _cutBuffer.getCell(addr).copy(this));
+            } catch (InvalidAddressException e) { /* Logically Unreachable */}
+        });
+        dirty();
     }
 }

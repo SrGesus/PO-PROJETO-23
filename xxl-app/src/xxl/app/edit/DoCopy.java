@@ -3,7 +3,7 @@ package xxl.app.edit;
 import pt.tecnico.uilib.menus.Command;
 import pt.tecnico.uilib.menus.CommandException;
 import xxl.Spreadsheet;
-// FIXME import classes
+import xxl.exceptions.InvalidRangeException;
 
 /**
  * Copy command.
@@ -17,7 +17,10 @@ class DoCopy extends Command<Spreadsheet> {
 
     @Override
     protected final void execute() throws CommandException {
-        // FIXME implement command
+        try { _receiver.copy(stringField("gama"));
+        } catch (InvalidRangeException e) {
+            throw new InvalidCellRangeException(e.getExpression());
+        }
     }
 
 }

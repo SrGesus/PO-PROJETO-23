@@ -3,6 +3,7 @@ package xxl.app.edit;
 import pt.tecnico.uilib.menus.Command;
 import pt.tecnico.uilib.menus.CommandException;
 import xxl.Spreadsheet;
+import xxl.exceptions.InvalidRangeException;
 // FIXME import classes
 
 /**
@@ -17,7 +18,10 @@ class DoCut extends Command<Spreadsheet> {
 
     @Override
     protected final void execute() throws CommandException {
-        // FIXME implement command
+        try { _receiver.cut(stringField("gama"));
+        } catch (InvalidRangeException e) {
+            throw new InvalidCellRangeException(e.getExpression());
+        }
     }
 
 }
