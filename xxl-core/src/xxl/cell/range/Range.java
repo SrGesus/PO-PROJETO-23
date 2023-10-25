@@ -60,6 +60,14 @@ public class Range {
         }
     }
 
+    public Address getStartAddress() {
+        return _startAddress;
+    }
+
+    public Address getEndAddress() {
+        return _endAddress;
+    }
+
     /**
      * @return the number of lines in this Range.
      */

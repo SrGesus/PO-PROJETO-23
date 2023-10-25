@@ -19,6 +19,9 @@ public class CellReference extends ObservableContent implements Observer {
     /** Referenced Cell. */
     private Cell _cell;
 
+    /** Saved value */
+    private Literal _value;
+
     /**
      * Constructor for CellReference.
      * @param store
@@ -38,18 +41,21 @@ public class CellReference extends ObservableContent implements Observer {
     public CellReference(Address address, Cell cell) throws InvalidAddressException {
         _address = address;
         _cell = cell;
+        _cell.attach(this);
+        _value = _cell.value();
     }
 
     /** @see Observer#update() */
     @Override
     public void update() {
+        _value = _cell.value();
         notifyObservers();
     }
 
     /** @see Content#value() */
     @Override
     public Literal value() {
-        return _cell.value();
+        return _value;
     }
 
     /**

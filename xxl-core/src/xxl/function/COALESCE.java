@@ -1,14 +1,9 @@
 package xxl.function;
 
 import xxl.Spreadsheet;
-import xxl.cell.range.Range;
-import xxl.content.Content;
-import xxl.content.literal.ErrorLiteral;
 import xxl.content.literal.StringLiteral;
-import xxl.content.literal.Literal;
 import xxl.exceptions.InvalidExpressionException;
 import xxl.exceptions.FunctionArgException;
-import xxl.exceptions.FunctionNameException;
 import xxl.exceptions.UnexpectedContentException;
 
 public class COALESCE extends RangeFunction {

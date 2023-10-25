@@ -37,7 +37,8 @@ public class Cell implements Serializable, Observable, Observer {
     public void setContent(Content content) {
         close();
         _content = content;
-        content.attach(this);
+        if (content != null)
+            content.attach(this);
         notifyObservers();
     }
 
