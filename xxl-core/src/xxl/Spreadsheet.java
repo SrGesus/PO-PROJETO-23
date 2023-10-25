@@ -257,6 +257,5 @@ public class Spreadsheet implements Serializable {
             targetIterable.next().paste(this, cutBufferIterable.next());
         }
         dirty();
-        _cutBuffer = null;
     }
 }
