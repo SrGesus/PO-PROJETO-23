@@ -3,7 +3,9 @@ package xxl.cell;
 import java.io.Serializable;
 
 import xxl.cell.range.Range;
+import xxl.exceptions.FunctionNameException;
 import xxl.exceptions.InvalidAddressException;
+import xxl.exceptions.InvalidExpressionException;
 import xxl.exceptions.InvalidRangeException;
 
 /**
@@ -63,6 +65,8 @@ public abstract class CellStore implements Serializable {
      * @throws InvalidAddressException
      */
     public void deleteCell(Address address) throws InvalidAddressException {
+        getCellReadOnly(address).setContent(null);
+        deleteEmptyCell(address);
     }
 
     /**

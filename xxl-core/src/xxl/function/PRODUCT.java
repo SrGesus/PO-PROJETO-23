@@ -7,7 +7,7 @@ import xxl.exceptions.InvalidExpressionException;
 import xxl.exceptions.FunctionArgException;
 import xxl.exceptions.UnexpectedContentException;
 
-public class AVERAGE extends RangeFunction {
+public class PRODUCT extends RangeFunction {
 
     /**
      * Constructor.
@@ -15,7 +15,7 @@ public class AVERAGE extends RangeFunction {
      * @param args
      * @throws FunctionArgException
      */
-    public AVERAGE(Spreadsheet spreadsheet, String[] args) throws FunctionArgException {
+    public PRODUCT(Spreadsheet spreadsheet, String[] args) throws FunctionArgException {
         super(spreadsheet, args);
     }
 
@@ -26,11 +26,11 @@ public class AVERAGE extends RangeFunction {
      */
     @Override
     protected Literal result() throws UnexpectedContentException, InvalidExpressionException{
-        int result = 0;
+        int result = 1;
         for (int i = 0; i < size(); i++) {
-            result += getArg(i).getInt();
+            result *= getArg(i).getInt();
         }
-        return new IntLiteral(result / size()); 
+        return new IntLiteral(result); 
     }
 
 
@@ -40,6 +40,6 @@ public class AVERAGE extends RangeFunction {
      */
     @Override
     public String getName() {
-        return "AVERAGE";
+        return "PRODUCT";
     }
 }

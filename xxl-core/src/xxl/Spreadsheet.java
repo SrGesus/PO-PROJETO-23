@@ -113,6 +113,7 @@ public class Spreadsheet implements Serializable {
                 case "MUL" -> new MUL(this, functionArgs);
                 case "SUB" -> new SUB(this, functionArgs);
                 case "AVERAGE" -> new AVERAGE(this, functionArgs);
+                case "PRODUCT" -> new PRODUCT(this, functionArgs);
                 case "CONCAT" -> new CONCAT(this, functionArgs);
                 case "COALESCE" -> new COALESCE(this, functionArgs);
                 default -> throw new FunctionNameException(functionName);
@@ -251,7 +252,9 @@ public class Spreadsheet implements Serializable {
         Iterator<Cell> originIterator = gamaOrigem.iterCellsReadOnly().iterator();
         Iterator<Cell> cutBufferIterator = getCutBufferRange().iterCells().iterator();
         while (cutBufferIterator.hasNext() && originIterator.hasNext()) {
-            cutBufferIterator.next().paste(this, originIterator.next()).close();
+            Cell bufferCell = cutBufferIterator.next();
+            bufferCell.paste(this, originIterator.next()).close();
+            bufferCell.value(); // Update value
         }
     }
 
@@ -268,10 +271,10 @@ public class Spreadsheet implements Serializable {
             Address cellAddr = gamaDestino.getStartAddress();
             // If buffer is horizontal
             if (gamaCutBuffer.getColumns() > 1)
-                gamaDestino = getGama(cellAddr + ":" + cellAddr.getLine() + ";" + _cellStore.getColumns());
+                gamaDestino = getGama(cellAddr + ":" + (cellAddr.getLine() + 1) + ";" + _cellStore.getColumns());
             // If buffer is vertical
             else
-                gamaDestino = getGama(cellAddr + ":" + _cellStore.getLines() + ";" + cellAddr.getColumn());
+                gamaDestino = getGama(cellAddr + ":" + _cellStore.getLines() + ";" + (cellAddr.getColumn() + 1));
         // otherwise if geometry does not match
         } else if (gamaDestino.getColumns() != gamaCutBuffer.getColumns() && gamaDestino.getLines() != gamaCutBuffer.getLines())
             throw new InvalidRangeException(gamaSpecification);

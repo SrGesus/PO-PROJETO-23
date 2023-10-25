@@ -28,7 +28,7 @@ class DoOpen extends Command<Calculator> {
             } catch (IOException e) {
                 throw new FileOpenFailedException(e);
             } catch (MissingFileAssociationException e) {
-                String filename = Form.requestString(Prompt.saveAs());
+                String filename = Form.requestString(Prompt.newSaveAs());
                 try {
                     _receiver.saveAs(filename);
                 } catch (IOException e2) {
