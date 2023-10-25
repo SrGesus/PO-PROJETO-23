@@ -32,9 +32,8 @@ public class COALESCE extends RangeFunction {
                 return new StringLiteral(result);
             } 
             catch (UnexpectedContentException e) {
-                System.out.println("RIPBOZO" + getArg(i).value());
+                /* Ignore non-Strings */
             }
-            System.out.println("RIPBOZO " + result);
         }
         return new StringLiteral(result);
     }
