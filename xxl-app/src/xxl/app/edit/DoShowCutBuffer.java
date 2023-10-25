@@ -19,8 +19,8 @@ class DoShowCutBuffer extends Command<Spreadsheet> {
     @Override
     protected final void execute() throws CommandException {
         try {
-            _receiver.showCutBuffer(stringField("gama")).forEach(str -> _display.popup(str));
-        } catch (InvalidRangeException e) {
+            _receiver.showCutBuffer().forEach(str -> _display.popup(str));
+        } catch (InvalidRangeException e) { // FIXME add proper exception
             throw new InvalidCellRangeException(e.getExpression());
         }
     }

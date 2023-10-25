@@ -85,4 +85,8 @@ public abstract class CellStore implements Serializable {
     public Range getRange(String rangeSpecification) throws InvalidRangeException {
         return new Range(this, rangeSpecification);
     }
+
+    public Range getWholeRange() throws InvalidRangeException{
+        return new Range(this, "1;1:" + _lines + ";" + _columns);
+    }
 }
