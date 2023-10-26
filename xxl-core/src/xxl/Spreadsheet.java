@@ -7,6 +7,10 @@ import java.util.Set;
 import java.lang.Iterable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Comparator;
+import java.util.Collections;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import xxl.cell.Address;
 import xxl.cell.Cell;
@@ -80,10 +84,35 @@ public class Spreadsheet implements Serializable {
     /**
      * Searches the store for matching Cells
      * @param v search visitor
-     * @return list of results
+     * @return list of results, with functions alphabetically sorted
      */
     public List<String> searchStore(SearchVisitor v) {
-        return _cellStore.searchStore(v);
+        List<String> result = _cellStore.searchStore(v);
+        
+        Comparator<String> functionSorter = new Comparator<String>() {
+            @Override
+            public int compare(String s1, String s2) {
+                // Find the substrings after the '=' character
+                String pattern = "=(.*?)(\\()";
+                Pattern r = Pattern.compile(pattern);
+
+                Matcher m1 = r.matcher(s1);
+                Matcher m2 = r.matcher(s2);
+
+                if (m1.find() && m2.find()) {
+                    String substring1 = m1.group(1);
+                    String substring2 = m2.group(1);
+
+                    return substring1.compareTo(substring2);
+                } else {
+                    // If no match is found, behave as if no comparison is needed
+                    return s1.compareTo(s2);
+                }
+            }
+        };
+
+        Collections.sort(result, functionSorter); // Sort the results based on function name alphabetical order
+        return result;
     }
 
     /**
