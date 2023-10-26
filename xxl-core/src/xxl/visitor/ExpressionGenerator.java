@@ -14,7 +14,7 @@ import xxl.function.MUL;
 import xxl.function.PRODUCT;
 import xxl.function.SUB;
 
-public class ExpressionVisitor implements Visitor<String> {
+public class ExpressionGenerator implements Visitor<String> {
 
   public String visitCell(Cell c) {
     if (c.isLiteral())

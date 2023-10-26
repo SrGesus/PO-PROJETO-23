@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import xxl.exceptions.InvalidAddressException;
-import xxl.visitor.ExpressionVisitor;
+import xxl.visitor.ExpressionGenerator;
 import xxl.visitor.SearchVisitor;
 
 /**
@@ -68,7 +68,7 @@ public class CellStoreArray extends CellStore {
 
     @Override
     public List<String> searchStore(SearchVisitor v) {
-        ExpressionVisitor stringifier = new ExpressionVisitor();
+        ExpressionGenerator stringifier = new ExpressionGenerator();
         List<String> results = new ArrayList<>();
         for (int i = 0; i < getLines(); i++) {
             Cell[] line = _cells[i];
