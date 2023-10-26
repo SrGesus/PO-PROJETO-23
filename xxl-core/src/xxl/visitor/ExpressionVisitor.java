@@ -56,19 +56,19 @@ public class ExpressionVisitor implements Visitor<String> {
   }
 
   public String visitAVERAGE(AVERAGE f) {
-    return "AVERAGE(" + f.getArg(0).accept(this) + "," + f.getArg(1).accept(this) + ")";
+    return "AVERAGE(" + f.getArg(0).accept(this) + ":" + f.getArg(1).accept(this) + ")";
   }
 
   public String visitPRODUCT(PRODUCT f) {
-    return "PRODUCT(" + f.getArg(0).accept(this) + "," + f.getArg(1).accept(this) + ")";
+    return "PRODUCT(" + f.getArg(0).accept(this) + ":" + f.getArg(1).accept(this) + ")";
   }
 
   public String visitCONCAT(CONCAT f) {
-    return "CONCAT(" + f.getArg(0).accept(this) + "," + f.getArg(1).accept(this) + ")";
+    return "CONCAT(" + f.getArg(0).accept(this) + ":" + f.getArg(1).accept(this) + ")";
   }
 
   public String visitCOALESCE(COALESCE f) {
-    return "COALESCE(" + f.getArg(0).accept(this) + "," + f.getArg(1).accept(this) + ")";
+    return "COALESCE(" + f.getArg(0).accept(this) + ":" + f.getArg(1).accept(this) + ")";
   }
 
 }

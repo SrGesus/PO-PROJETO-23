@@ -6,7 +6,6 @@ import xxl.content.literal.Literal;
 import xxl.exceptions.InvalidExpressionException;
 import xxl.exceptions.FunctionArgException;
 import xxl.exceptions.UnexpectedContentException;
-import xxl.visitor.Visitable;
 import xxl.visitor.Visitor;
 
 public class AVERAGE extends RangeFunction {

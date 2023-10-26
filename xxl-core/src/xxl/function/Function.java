@@ -62,7 +62,7 @@ public abstract class Function extends ObservableContent implements Observer {
     /**
      * @return the number of arguments of this Function.
      */
-    protected int size() {
+    public int size() {
         return _arguments.size();
     }
 
