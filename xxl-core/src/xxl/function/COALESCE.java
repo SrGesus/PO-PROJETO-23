@@ -5,6 +5,8 @@ import xxl.content.literal.StringLiteral;
 import xxl.exceptions.InvalidExpressionException;
 import xxl.exceptions.FunctionArgException;
 import xxl.exceptions.UnexpectedContentException;
+import xxl.visitor.Visitable;
+import xxl.visitor.Visitor;
 
 public class COALESCE extends RangeFunction {
 
@@ -46,5 +48,10 @@ public class COALESCE extends RangeFunction {
     @Override
     public String getName() {
         return "COALESCE";
+    }
+
+    /** @see Visitable#accept(Visitor) */
+    public <T> T accept(Visitor<T> visitor) {
+        return visitor.visitCOALESCE(this);
     }
 }

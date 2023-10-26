@@ -11,12 +11,14 @@ import xxl.content.literal.Literal;
 import xxl.exceptions.FunctionNameException;
 import xxl.observer.Observable;
 import xxl.observer.Observer;
+import xxl.visitor.Visitable;
+import xxl.visitor.Visitor;
 
 /**
  * Class that represents a Cell of a Spreadsheet.
  * All functions that alter the state of a Cell are package-private.
  */
-public class Cell implements Serializable, Observable, Observer {
+public class Cell implements Serializable, Observable, Observer, Visitable {
 
     /** The content of this Cell */
     private Content _content = null;
@@ -40,6 +42,10 @@ public class Cell implements Serializable, Observable, Observer {
         if (content != null)
             content.attach(this);
         notifyObservers();
+    }
+
+    public Content getContent() {
+        return _content;
     }
 
     /**
@@ -145,5 +151,10 @@ public class Cell implements Serializable, Observable, Observer {
     /** @see Observer#close() */
     public void close() {
         if (_content != null) _content.close();
+    }
+
+    /** @see Visitable#accept(Visitor) */
+    public <T> T accept(Visitor<T> visitor) {
+        return visitor.visitCell(this);
     }
 }

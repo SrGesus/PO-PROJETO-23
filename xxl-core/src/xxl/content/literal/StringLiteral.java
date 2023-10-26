@@ -1,7 +1,8 @@
 package xxl.content.literal;
 
-import xxl.content.Content;
 import xxl.exceptions.InvalidExpressionException;
+import xxl.visitor.Visitable;
+import xxl.visitor.Visitor;
 
 /**
  * Represents a value that is a string.
@@ -33,5 +34,10 @@ public class StringLiteral extends Literal {
     @Override
     public String toString() {
         return "'" + _value;
+    }
+
+    /** @see Visitable#accept(Visitor) */
+    public <T> T accept(Visitor<T> visitor) {
+        return visitor.visitStringLiteral(this);
     }
 }

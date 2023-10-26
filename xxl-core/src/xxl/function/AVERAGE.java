@@ -6,6 +6,8 @@ import xxl.content.literal.Literal;
 import xxl.exceptions.InvalidExpressionException;
 import xxl.exceptions.FunctionArgException;
 import xxl.exceptions.UnexpectedContentException;
+import xxl.visitor.Visitable;
+import xxl.visitor.Visitor;
 
 public class AVERAGE extends RangeFunction {
 
@@ -41,5 +43,10 @@ public class AVERAGE extends RangeFunction {
     @Override
     public String getName() {
         return "AVERAGE";
+    }
+
+    /** @see Visitable#accept(Visitor) */
+    public <T> T accept(Visitor<T> visitor) {
+        return visitor.visitAVERAGE(this);
     }
 }

@@ -4,6 +4,8 @@ import xxl.content.literal.StringLiteral;
 import xxl.exceptions.InvalidExpressionException;
 import xxl.exceptions.FunctionArgException;
 import xxl.exceptions.UnexpectedContentException;
+import xxl.visitor.Visitable;
+import xxl.visitor.Visitor;
 
 public class CONCAT extends RangeFunction {
 
@@ -44,5 +46,10 @@ public class CONCAT extends RangeFunction {
     @Override
     public String getName() {
         return "CONCAT";
+    }
+
+    /** @see Visitable#accept(Visitor) */
+    public <T> T accept(Visitor<T> visitor) {
+        return visitor.visitCONCAT(this);
     }
 }

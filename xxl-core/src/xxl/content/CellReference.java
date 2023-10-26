@@ -6,6 +6,8 @@ import xxl.cell.CellStore;
 import xxl.content.literal.Literal;
 import xxl.exceptions.InvalidAddressException;
 import xxl.observer.Observer;
+import xxl.visitor.Visitable;
+import xxl.visitor.Visitor;
 
 /**
  * A Function that represents a reference to a Cell.
@@ -58,6 +60,10 @@ public class CellReference extends ObservableContent implements Observer {
         return _value;
     }
 
+    public Address getAddress() {
+        return _address;
+    }
+
     /**
      * @return the address of the referenced Cell.
      */
@@ -73,5 +79,10 @@ public class CellReference extends ObservableContent implements Observer {
     @Override
     public void close() {
         _cell.detach(this);
+    }
+
+    /** @see Visitable#accept(Visitor) */
+    public <T> T accept(Visitor<T> visitor) {
+        return visitor.visitCellReference(this);
     }
 }

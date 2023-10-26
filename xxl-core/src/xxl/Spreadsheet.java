@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.lang.Iterable;
 import java.util.Iterator;
+import java.util.List;
 
 import xxl.cell.Address;
 import xxl.cell.Cell;
@@ -21,6 +22,7 @@ import xxl.exceptions.*;
 import xxl.function.*;
 import xxl.user.DataStore;
 import xxl.user.User;
+import xxl.visitor.SearchVisitor;
 
 /**
  * Class representing a spreadsheet.
@@ -73,6 +75,15 @@ public class Spreadsheet implements Serializable {
      */
     public boolean isDirty() {
         return _dirty;
+    }
+
+    /**
+     * Searches the store for matching Cells
+     * @param v search visitor
+     * @return list of results
+     */
+    public List<String> searchStore(SearchVisitor v) {
+        return _cellStore.searchStore(v);
     }
 
     /**

@@ -55,7 +55,7 @@ public abstract class Function extends ObservableContent implements Observer {
      * @param index
      * @return the nth argument of this Function.
      */
-    protected Content getArg(int index) {
+    public Content getArg(int index) {
         return _arguments.get(index);
     }
 

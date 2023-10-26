@@ -5,11 +5,12 @@ import java.io.Serializable;
 import xxl.content.literal.Literal;
 import xxl.exceptions.UnexpectedContentException;
 import xxl.observer.Observable;
+import xxl.visitor.Visitable;
 
 /**
  * Class representing the contents of a cell.
  */
-public abstract class Content implements Serializable, Observable {
+public abstract class Content implements Serializable, Observable, Visitable {
 
     /**
      * @return The String value of this content.

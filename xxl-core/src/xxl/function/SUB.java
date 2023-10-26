@@ -2,6 +2,8 @@ package xxl.function;
 
 import xxl.Spreadsheet;
 import xxl.exceptions.FunctionArgException;
+import xxl.visitor.Visitable;
+import xxl.visitor.Visitor;
 
 public class SUB extends BinaryFunction {
 
@@ -31,5 +33,10 @@ public class SUB extends BinaryFunction {
     @Override
     public String getName() {
         return "SUB";
+    }
+
+    /** @see Visitable#accept(Visitor) */
+    public <T> T accept(Visitor<T> visitor) {
+        return visitor.visitSUB(this);
     }
 }

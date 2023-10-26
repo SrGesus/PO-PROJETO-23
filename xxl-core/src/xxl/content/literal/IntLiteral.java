@@ -1,6 +1,8 @@
 package xxl.content.literal;
 
 import xxl.exceptions.InvalidExpressionException;
+import xxl.visitor.Visitable;
+import xxl.visitor.Visitor;
 
 /**
  * Represents a value that is an integer.
@@ -41,5 +43,10 @@ public class IntLiteral extends Literal {
     @Override
     public String toString() {
         return Integer.toString(_value);
+    }
+
+    /** @see Visitable#accept(Visitor) */
+    public <T> T accept(Visitor<T> visitor) {
+        return visitor.visitIntLiteral(this);
     }
 }
