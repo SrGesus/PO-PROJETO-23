@@ -6,7 +6,7 @@ import java.util.List;
 import xxl.cell.range.Range;
 import xxl.exceptions.InvalidAddressException;
 import xxl.exceptions.InvalidRangeException;
-import xxl.visitor.SearchVisitor;
+import xxl.search.SearchVisitor;
 
 /**
  * Class that stores all Cells of a Spreadsheet.
@@ -77,6 +77,16 @@ public abstract class CellStore implements Serializable {
     protected abstract void deleteEmptyCell(Address address);
 
     /**
+     * Places cell on given address.
+     * @param address
+     * @param cell
+     * @throws InvalidAddressException
+     */
+    public void putCell(Address address, Cell cell) throws InvalidAddressException {
+        getCell(address).paste(cell);
+    }
+
+    /**
      * Searches the store for matching Cells
      * @param v search visitor
      * @return list of results
@@ -93,7 +103,7 @@ public abstract class CellStore implements Serializable {
      * @return the Range of the given specification.
      * @throws InvalidRangeException
      */
-    public Range getRange(String rangeSpecification) throws InvalidRangeException {
-        return new Range(this, rangeSpecification);
+    public Range getRange(Address startAddress, Address endAddress) throws InvalidRangeException {
+        return new Range(this, startAddress, endAddress);
     }
 }

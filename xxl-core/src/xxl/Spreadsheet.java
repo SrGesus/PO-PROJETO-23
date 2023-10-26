@@ -5,7 +5,6 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 import java.lang.Iterable;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Comparator;
 import java.util.Collections;
@@ -13,9 +12,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import xxl.cell.Address;
-import xxl.cell.Cell;
 import xxl.cell.CellStore;
 import xxl.cell.CellStoreArray;
+import xxl.cell.CutBuffer;
 import xxl.cell.range.Range;
 import xxl.content.CellReference;
 import xxl.content.Content;
@@ -24,9 +23,9 @@ import xxl.content.literal.IntLiteral;
 import xxl.content.literal.StringLiteral;
 import xxl.exceptions.*;
 import xxl.function.*;
+import xxl.search.SearchVisitor;
 import xxl.user.DataStore;
 import xxl.user.User;
-import xxl.visitor.SearchVisitor;
 
 /**
  * Class representing a spreadsheet.
@@ -39,7 +38,7 @@ public class Spreadsheet implements Serializable {
     /** Flexible storage for Cells */
     private CellStore _cellStore;
 
-    private CellStore _cutBuffer = new CellStoreArray(0, 0);
+    private CutBuffer _cutBuffer = new CutBuffer();
 
     /** Set of user names */
     private Set<String> _users = null;
@@ -162,7 +161,6 @@ public class Spreadsheet implements Serializable {
         return new ErrorLiteral();
     }
 
-    
     /**
      * getRange but works for single cells.
      * @param gamaSpecification ::= LINHA;COLUNA:LINHA;COLUNA | LINHA;COLUNA
@@ -170,14 +168,16 @@ public class Spreadsheet implements Serializable {
      * @throws InvalidRangeException
      */
     public Range getGama(String gamaSpecification) throws InvalidRangeException {
+        /** Parsing of rangeSpecification */
+        String[] range = gamaSpecification.split(":");
         try {
-            return _cellStore.getRange(gamaSpecification);
-        } catch (InvalidRangeException e) {
-            try {
-                return _cellStore.getRange(gamaSpecification + ":" + gamaSpecification);
-            } catch (InvalidRangeException e2) {
-                throw e;
-            }
+            return switch (range.length) {
+                case 1 -> _cellStore.getRange(new Address(range[0]), new Address(range[0]));
+                case 2 -> _cellStore.getRange(new Address(range[0]), new Address(range[1]));
+                default -> throw new InvalidRangeException(gamaSpecification);
+            };
+        } catch (InvalidAddressException e) {
+            throw new InvalidRangeException(gamaSpecification);
         }
     }
 
@@ -188,14 +188,6 @@ public class Spreadsheet implements Serializable {
      */
     public Iterable<String> showGama(String rangeSpecification) throws InvalidRangeException {
         return getGama(rangeSpecification).iterStrings();
-    }
-
-    /**
-     * @return 
-     * @throws InvalidRangeException
-     */
-    public Iterable<String> showCutBuffer() throws InvalidRangeException {
-        return getCutBufferRange().iterStrings();
     }
 
     /**
@@ -218,7 +210,8 @@ public class Spreadsheet implements Serializable {
     public void insertGama(String gamaSpecification, String contentSpecification) throws InvalidExpressionException, FunctionNameException {
         Content content = parseContent(contentSpecification, true);
         getGama(gamaSpecification).iterAddresses().forEach(addr -> {
-            try {_cellStore.getCell(addr).setContent(content);
+            try {
+                _cellStore.getCell(addr).setContent(content);
             } catch (InvalidAddressException e) { /* Logically Unreachable */}
         } );
         dirty();
@@ -254,24 +247,7 @@ public class Spreadsheet implements Serializable {
         dirty();
     }
 
-    /**
-     * Changes the filename of this spreadsheet.
-     * @param filename
-     */
-    public void rename(DataStore store, String filename) {
-        store.renameSpreadsheet(_filename, filename);
-        _filename = filename;
-    }
-
-    private Range getCutBufferRange() {
-        try {
-            return _cutBuffer.getRange("1;1:" + _cutBuffer.getLines() + ";" + _cutBuffer.getColumns());
-        } catch (InvalidRangeException e) {
-            /* Logically Unreachable */
-            e.printStackTrace();
-            return null;
-        }
-    }
+//   Cut Buffer Apparattus
 
     /**
      * Cuts the content of the target cells into the cut buffer.
@@ -287,15 +263,8 @@ public class Spreadsheet implements Serializable {
      * @param gamaSpecification ::= LINHA;COLUNA:LINHA;COLUNA | LINHA;COLUNA
      */
     public void copy(String gamaSpecification) throws InvalidRangeException {
-        Range gamaOrigem = getGama(gamaSpecification);
-        _cutBuffer = new CellStoreArray(gamaOrigem.getLines(), gamaOrigem.getColumns());
-        Iterator<Cell> originIterator = gamaOrigem.iterCellsReadOnly().iterator();
-        Iterator<Cell> cutBufferIterator = getCutBufferRange().iterCells().iterator();
-        while (cutBufferIterator.hasNext() && originIterator.hasNext()) {
-            Cell bufferCell = cutBufferIterator.next();
-            bufferCell.paste(this, originIterator.next()).close();
-            bufferCell.value(); // Update value
-        }
+        Range origin = getGama(gamaSpecification);
+        _cutBuffer.copy(origin);
     }
 
     /**
@@ -304,25 +273,15 @@ public class Spreadsheet implements Serializable {
      */
     public void paste(String gamaSpecification) throws InvalidRangeException {
         Range gamaDestino = getGama(gamaSpecification);
-        // Get all of the cut buffer
-        Range gamaCutBuffer = _cutBuffer.getRange("1;1:" + _cutBuffer.getLines() + ";" + _cutBuffer.getColumns());
-        // If provided range is single cell
-        if (gamaDestino.getColumns() == 1 && gamaDestino.getLines() == 1) {
-            Address cellAddr = gamaDestino.getStartAddress();
-            // If buffer is horizontal
-            if (gamaCutBuffer.getColumns() > 1)
-                gamaDestino = getGama(cellAddr + ":" + (cellAddr.getLine() + 1) + ";" + _cellStore.getColumns());
-            // If buffer is vertical
-            else
-                gamaDestino = getGama(cellAddr + ":" + _cellStore.getLines() + ";" + (cellAddr.getColumn() + 1));
-        // otherwise if geometry does not match
-        } else if (gamaDestino.getColumns() != gamaCutBuffer.getColumns() && gamaDestino.getLines() != gamaCutBuffer.getLines())
-            throw new InvalidRangeException(gamaSpecification);
-        Iterator<Cell> destinationIterator = gamaDestino.iterCells().iterator();
-        Iterator<Cell> cutBufferIterator = gamaCutBuffer.iterCellsReadOnly().iterator();
-        // While there are cells and space to paste
-        while (destinationIterator.hasNext() && cutBufferIterator.hasNext())
-            destinationIterator.next().paste(this, cutBufferIterator.next());
+        _cutBuffer.paste(gamaDestino, _cellStore);
         dirty();
+    }
+
+    /**
+     * @return 
+     * @throws InvalidRangeException
+     */
+    public Iterable<String> showCutBuffer() throws InvalidRangeException {
+        return _cutBuffer.getCutBufferRange().iterStrings();
     }
 }

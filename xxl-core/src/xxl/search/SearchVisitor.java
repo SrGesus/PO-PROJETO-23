@@ -1,4 +1,6 @@
-package xxl.visitor;
+package xxl.search;
+
+import xxl.visitor.Visitor;
 
 /**
  * A Content visitor that will define whether or not 

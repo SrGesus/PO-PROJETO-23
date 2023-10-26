@@ -1,4 +1,4 @@
-package xxl.visitor;
+package xxl.search;
 
 import xxl.Spreadsheet;
 import xxl.cell.Cell;

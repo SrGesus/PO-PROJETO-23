@@ -39,12 +39,6 @@ public class IntLiteral extends Literal {
         return _value;
     }
 
-    /** @see java.lang.Object#toString() */
-    @Override
-    public String toString() {
-        return Integer.toString(_value);
-    }
-
     /** @see Visitable#accept(Visitor) */
     public <T> T accept(Visitor<T> visitor) {
         return visitor.visitIntLiteral(this);

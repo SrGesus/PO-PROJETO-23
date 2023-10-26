@@ -40,7 +40,7 @@ public class CellReference extends ObservableContent implements Observer {
      * @param address
      * @throws InvalidAddressException
      */
-    public CellReference(Address address, Cell cell) throws InvalidAddressException {
+    public CellReference(Address address, Cell cell) {
         _address = address;
         _cell = cell;
         _cell.attach(this);
@@ -64,12 +64,8 @@ public class CellReference extends ObservableContent implements Observer {
         return _address;
     }
 
-    /**
-     * @return the address of the referenced Cell.
-     */
-    @Override
-    public String toString() {
-        return _address.toString();
+    public Cell getCell() {
+        return _cell;
     }
 
     /**

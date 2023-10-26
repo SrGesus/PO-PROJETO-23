@@ -2,8 +2,8 @@ package xxl.app.search;
 
 import pt.tecnico.uilib.menus.Command;
 import xxl.Spreadsheet;
-import xxl.visitor.SearchValue;
-import xxl.visitor.SearchVisitor;
+import xxl.search.SearchValue;
+import xxl.search.SearchVisitor;
 
 /**
  * Command for searching content values.

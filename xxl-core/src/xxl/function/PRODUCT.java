@@ -1,6 +1,9 @@
 package xxl.function;
 
+import java.util.List;
+
 import xxl.Spreadsheet;
+import xxl.content.Content;
 import xxl.content.literal.IntLiteral;
 import xxl.content.literal.Literal;
 import xxl.exceptions.InvalidExpressionException;
@@ -21,6 +24,13 @@ public class PRODUCT extends RangeFunction {
         super(spreadsheet, args);
     }
 
+    /**
+     * Constructor from Content.
+     * @param args
+     */
+    public PRODUCT(List<Content> args) {
+        super(args);
+    }
 
     /**
      * @return the result of the function
@@ -33,16 +43,6 @@ public class PRODUCT extends RangeFunction {
             result *= getArg(i).getInt();
         }
         return new IntLiteral(result); 
-    }
-
-
-    /**
-     * @return the name of the function
-     * @see Function#getName()
-     */
-    @Override
-    public String getName() {
-        return "PRODUCT";
     }
 
     /** @see Visitable#accept(Visitor) */

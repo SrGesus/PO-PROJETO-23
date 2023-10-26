@@ -32,11 +32,6 @@ public abstract class Content implements Serializable, Observable, Visitable {
      * @return the Literal value of this content.
      */
     public abstract Literal value();
-
-    /** Force the re-implementation of toString */
-    @Override
-    public abstract String toString();
-
     /** 
      * @see Observer#close() 
      */

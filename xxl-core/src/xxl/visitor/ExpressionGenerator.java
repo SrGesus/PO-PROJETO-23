@@ -17,10 +17,9 @@ import xxl.function.SUB;
 public class ExpressionGenerator implements Visitor<String> {
 
   public String visitCell(Cell c) {
-    if (c.isLiteral())
-        return c.value().accept(this);
-    else
-        return c.value().accept(this) + "=" + c.getContent().accept(this);
+    if (c.isEmpty()) return "";
+    if (c.isLiteral()) return c.value().accept(this);
+    return c.value().accept(this) + "=" + c.getContent().accept(this);
   }
 
   public String visitCellReference(CellReference c) {
@@ -56,19 +55,19 @@ public class ExpressionGenerator implements Visitor<String> {
   }
 
   public String visitAVERAGE(AVERAGE f) {
-    return "AVERAGE(" + f.getArg(0).accept(this) + ":" + f.getArg(1).accept(this) + ")";
+    return "AVERAGE(" + f.getArg(0).accept(this) + ":" + f.getArg(f.size()-1).accept(this) + ")";
   }
 
   public String visitPRODUCT(PRODUCT f) {
-    return "PRODUCT(" + f.getArg(0).accept(this) + ":" + f.getArg(1).accept(this) + ")";
+    return "PRODUCT(" + f.getArg(0).accept(this) + ":" + f.getArg(f.size()-1).accept(this) + ")";
   }
 
   public String visitCONCAT(CONCAT f) {
-    return "CONCAT(" + f.getArg(0).accept(this) + ":" + f.getArg(1).accept(this) + ")";
+    return "CONCAT(" + f.getArg(0).accept(this) + ":" + f.getArg(f.size()-1).accept(this) + ")";
   }
 
   public String visitCOALESCE(COALESCE f) {
-    return "COALESCE(" + f.getArg(0).accept(this) + ":" + f.getArg(1).accept(this) + ")";
+    return "COALESCE(" + f.getArg(0).accept(this) + ":" + f.getArg(f.size()-1).accept(this) + ")";
   }
 
 }

@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import xxl.exceptions.InvalidAddressException;
+import xxl.search.SearchVisitor;
 import xxl.visitor.ExpressionGenerator;
-import xxl.visitor.SearchVisitor;
 
 /**
  * Class that stores all Cells of a Spreadsheet in a primitive array.

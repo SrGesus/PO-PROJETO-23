@@ -1,4 +1,4 @@
-package xxl.visitor;
+package xxl.search;
 
 import xxl.cell.Cell;
 import xxl.content.*;

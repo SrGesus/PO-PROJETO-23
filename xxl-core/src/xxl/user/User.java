@@ -1,7 +1,8 @@
 package xxl.user;
 
 import java.io.Serializable;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Represents an user of the Calculator.
@@ -12,7 +13,7 @@ public class User implements Serializable {
     private String _name;
 
     /** List of Spreadsheet's filenames */
-    private List<String> _spreadsheets;
+    private Set<String> _spreadsheets = new HashSet<>();
 
     /**
      * Constructor.
@@ -41,19 +42,15 @@ public class User implements Serializable {
     }
 
     /**
-     * Replaces name of a spreadsheet.
-     * @param oldFilename
-     * @param newFilename
-     */
-    public void renameSpreadsheet(String oldFilename, String newFilename) {
-        removeSpreadsheet(oldFilename);
-        addSpreadsheet(newFilename);
-    }
-
-    /**
      * @return user's name.
      */
     public String getName() {
         return _name;
+    }
+
+    /** @see Object#hashCode() */
+    @Override
+    public int hashCode() {
+        return getName().hashCode();
     }
 }

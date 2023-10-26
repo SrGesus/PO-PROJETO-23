@@ -26,23 +26,21 @@ public class Range {
 
     /**
      * Constructor for Cell Iterator.
-     * @param rangeSpecification ::= LINHA;COLUNA:LINHA;COLUNA
+     * @param store that this range iterates over
+     * @param startAddress
+     * @param endAddress
      * @throws InvalidRangeException
      */
-    public Range(CellStore store, String rangeSpecification) throws InvalidRangeException {
+    public Range(CellStore store, Address startAddress, Address endAddress) throws InvalidRangeException {
         try {
-            /** Parsing of rangeSpecification */
-            String[] range = rangeSpecification.split(":");
-
-            _startAddress = new Address(range[0]);
-            _endAddress = new Address(range[1]);
+            _startAddress = startAddress;
+            _endAddress = endAddress;
             _store = store;
 
-            
             /** Check if Range is either a line or a column */
             if (_startAddress.getLine() != _endAddress.getLine() &&
                 _startAddress.getColumn() != _endAddress.getColumn()) {
-                throw new InvalidRangeException(rangeSpecification);
+                throw new InvalidRangeException(startAddress + ":" + endAddress);
             }
 
             /** If Range start is before the end switch order */
@@ -56,7 +54,7 @@ public class Range {
             /** Attempt to get the last cell to make sure range is in store bounds */
             store.getCellReadOnly(_endAddress);
         } catch (InvalidAddressException | IndexOutOfBoundsException e) {
-            throw new InvalidRangeException(rangeSpecification);
+            throw new InvalidRangeException(startAddress + ":" + endAddress);
         }
     }
 

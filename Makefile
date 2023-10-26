@@ -1,4 +1,4 @@
-PO_UILIB_DIR=/usr/share/java
+PO_UILIB_DIR=../po-uilib
 CLASSPATH=xxl-core/xxl-core.jar:xxl-app/xxl-app.jar:$(PO_UILIB_DIR)/po-uilib.jar
 JAVA = $(shell find . -name \*.java)
 

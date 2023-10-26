@@ -2,9 +2,8 @@ package xxl.app.search;
 
 import pt.tecnico.uilib.menus.Command;
 import xxl.Spreadsheet;
-import xxl.visitor.SearchFunctionName;
-// FIXME import classes
-import xxl.visitor.SearchVisitor;
+import xxl.search.SearchFunctionName;
+import xxl.search.SearchVisitor;
 
 /**
  * Command for searching function names.
