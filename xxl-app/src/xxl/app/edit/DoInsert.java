@@ -5,6 +5,7 @@ import pt.tecnico.uilib.menus.CommandException;
 
 import xxl.Spreadsheet;
 import xxl.exceptions.FunctionNameException;
+import xxl.exceptions.InvalidExpressionException;
 import xxl.exceptions.UnrecognizedEntryException;
 
 /**
@@ -21,9 +22,9 @@ class DoInsert extends Command<Spreadsheet> {
     @Override
     protected final void execute() throws CommandException {
         try {
-            _receiver.insertContents(stringField("gama"), stringField("content"));
-        } catch (UnrecognizedEntryException e) {
-            throw new InvalidCellRangeException(e.getEntrySpecification());
+            _receiver.insertGama(stringField("gama"), stringField("content"));
+        } catch (InvalidExpressionException e) {
+            throw new InvalidCellRangeException(e.getExpression());
         } catch (FunctionNameException e) {
             throw new UnknownFunctionException(e.getFunctionName());
         }

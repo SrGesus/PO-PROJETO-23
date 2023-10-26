@@ -3,7 +3,8 @@ package xxl.app.edit;
 import pt.tecnico.uilib.menus.Command;
 import pt.tecnico.uilib.menus.CommandException;
 import xxl.Spreadsheet;
-// FIXME import classes
+import xxl.exceptions.InvalidRangeException;
+
 
 /**
  * Paste command.
@@ -17,7 +18,10 @@ class DoPaste extends Command<Spreadsheet> {
 
     @Override
     protected final void execute() throws CommandException {
-        // FIXME implement command
+        try { _receiver.paste(stringField("gama"));
+        } catch (InvalidRangeException e) {
+            throw new InvalidCellRangeException(e.getExpression());
+        }
     }
 
 }

@@ -1,56 +1,57 @@
 package xxl.function;
 
-import xxl.cell.Cell;
-import xxl.cell.CellStore;
+import xxl.Spreadsheet;
 import xxl.content.Content;
-import xxl.content.IntContent;
+import xxl.content.literal.ErrorLiteral;
+import xxl.content.literal.IntLiteral;
+import xxl.content.literal.Literal;
 import xxl.exceptions.FunctionArgException;
+import xxl.exceptions.FunctionNameException;
 import xxl.exceptions.UnexpectedContentException;
 
-/**
- * A Function that receives two integer arguments.
- * Returns an integer.
- */
-public abstract class BinaryFunction extends FunctionStrategy {
+public abstract class BinaryFunction extends Function {
 
     /**
      * Constructor.
-     * @param store
-     * @param output
-     * @param args must be two Strings representing the two arguments.
+     * @param spreadsheet
+     * @param args
      * @throws FunctionArgException
      */
-    public BinaryFunction(CellStore store, Cell output, String... args) throws FunctionArgException {
-        super(output);
-        if (args.length != 2) throw new FunctionArgException();
-        addCellArg(store, "arg1", args[0]);
-        addCellArg(store, "arg2", args[1]);
-    }
-
-    /** @see xxl.function.FunctionStrategy#result() */
-    @Override
-    protected Content result() throws FunctionArgException {
+    protected BinaryFunction(Spreadsheet spreadsheet, String[] args) throws FunctionArgException {
         try {
-            int arg1 = getCellArg("arg1").getContent().getInt();
-            int arg2 = getCellArg("arg2").getContent().getInt();
-            return new IntContent(compute(arg1, arg2));
-        } catch (UnexpectedContentException e) {
+            if (args.length != 2) 
+                throw new FunctionArgException();
+            for (String arg : args)
+                addArg(spreadsheet.parseContent(arg, false));
+        } catch (FunctionNameException e) {
             throw new FunctionArgException();
         }
     }
-
-    /** @see xxl.function.FunctionStrategy#isValidInput */
+    
+    /**
+     * @return the result of the function
+     * @see Function#compute()
+     */
     @Override
-    protected boolean isValidInput(Cell c) {
-        return c.getContent() instanceof IntContent;
+    protected final Literal compute() {
+        try {
+            return new IntLiteral(result(getArg(0).getInt(), getArg(1).getInt()));
+        } catch (UnexpectedContentException | ArithmeticException e) {
+            return new ErrorLiteral();
+        }
     }
 
     /**
-     * Template method that computes the result of the function.
-     * @param arg1
-     * @param arg2
-     * @return
-     * @throws FunctionArgException
+     * Template method.
+     * @param x
+     * @param y
+     * @return result of the function
      */
-    protected abstract int compute(int arg1, int arg2) throws FunctionArgException;
+    protected abstract int result(int x, int y) ;
+
+    /** @see Content#toString() */
+    @Override
+    public String toString() {
+        return getName() + "(" + getArg(0) + "," + getArg(1) + ")";
+    }
 }

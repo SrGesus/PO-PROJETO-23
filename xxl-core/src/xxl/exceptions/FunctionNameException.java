@@ -5,7 +5,7 @@ package xxl.exceptions;
  */
 public class FunctionNameException extends Exception {
     /** Name of function that was not found. */
-    String _functionName;
+    private String _functionName;
 
     /**
      * @param functionName

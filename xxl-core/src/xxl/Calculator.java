@@ -9,7 +9,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 
-import xxl.exceptions.FunctionNameException;
 import xxl.exceptions.ImportFileException;
 import xxl.exceptions.MissingFileAssociationException;
 import xxl.exceptions.UnavailableFileException;
@@ -100,7 +99,7 @@ public class Calculator {
                 if (line.length != 2) continue;
                 _spreadsheet.insertContents(line[0], line[1]);
             }
-        } catch (IOException | UnrecognizedEntryException | FunctionNameException e) {
+        } catch (IOException | UnrecognizedEntryException e) {
             throw new ImportFileException(filename, e);
         }
     }

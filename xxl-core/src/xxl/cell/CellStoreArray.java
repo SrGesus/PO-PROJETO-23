@@ -1,6 +1,11 @@
 package xxl.cell;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import xxl.exceptions.InvalidAddressException;
+import xxl.visitor.ExpressionGenerator;
+import xxl.visitor.SearchVisitor;
 
 /**
  * Class that stores all Cells of a Spreadsheet in a primitive array.
@@ -39,7 +44,7 @@ public class CellStoreArray extends CellStore {
         } catch (IndexOutOfBoundsException e) {
             throw new InvalidAddressException(address.toString());
         }
-    };
+    }
 
     /**
      * If the Cell is not in the store, an empty Cell unnattached to the store is returned.
@@ -59,7 +64,24 @@ public class CellStoreArray extends CellStore {
         } catch (IndexOutOfBoundsException e) {
             throw new InvalidAddressException(address.toString());
         }
-    };
+    }
+
+    @Override
+    public List<String> searchStore(SearchVisitor v) {
+        ExpressionGenerator stringifier = new ExpressionGenerator();
+        List<String> results = new ArrayList<>();
+        for (int i = 0; i < getLines(); i++) {
+            Cell[] line = _cells[i];
+            if (line == null) continue;
+            for (int j = 0; j < getColumns(); j++) {
+                Cell cell = line[j];
+                if (cell == null) continue;
+                if (cell.accept(v))
+                    results.add(new Address(i, j).toString() + "|" + cell.accept(stringifier));
+            }
+        }
+        return results;
+    }
 
     /**
      * Removes Cell from the store if it is empty,
@@ -78,7 +100,7 @@ public class CellStoreArray extends CellStore {
         } catch (IndexOutOfBoundsException e) {
             return;
         }
-    };
+    }
 
     /** 
      * Will remove all empty lines from the store.

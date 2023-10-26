@@ -1,27 +1,42 @@
 package xxl.function;
 
-import xxl.cell.Cell;
-import xxl.cell.CellStore;
+import xxl.Spreadsheet;
 import xxl.exceptions.FunctionArgException;
+import xxl.visitor.Visitable;
+import xxl.visitor.Visitor;
 
-/**
- * Adds two integers.
- */
 public class ADD extends BinaryFunction {
+
     /**
      * Constructor.
-     * @param store
-     * @param output
-     * @param args must be two Strings representing the arguments.
+     * @param spreadsheet
+     * @param args
      * @throws FunctionArgException
      */
-    public ADD(CellStore store, Cell output, String... args) throws FunctionArgException {
-        super(store, output, args);
+    public ADD(Spreadsheet spreadsheet, String[] args) throws FunctionArgException {
+        super(spreadsheet, args);
     }
 
-    /** @see xxl.function.BinaryFunction#compute(int, int) */
+    /**
+     * @return the result of the function
+     * @see BinaryFunction#result(int, int)
+     */
     @Override
-    protected int compute(int arg1, int arg2) {
-        return arg1 + arg2;
+    protected int result(int x, int y) {
+        return x + y;
+    }
+
+    /**
+     * @return the name of the function
+     * @see Function#getName()
+     */
+    @Override
+    public String getName() {
+        return "ADD";
+    }
+
+    /** @see Visitable#accept(Visitor) */
+    public <T> T accept(Visitor<T> visitor) {
+        return visitor.visitADD(this);
     }
 }

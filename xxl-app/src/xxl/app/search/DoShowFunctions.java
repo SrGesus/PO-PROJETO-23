@@ -2,7 +2,9 @@ package xxl.app.search;
 
 import pt.tecnico.uilib.menus.Command;
 import xxl.Spreadsheet;
+import xxl.visitor.SearchFunctionName;
 // FIXME import classes
+import xxl.visitor.SearchVisitor;
 
 /**
  * Command for searching function names.
@@ -11,12 +13,13 @@ class DoShowFunctions extends Command<Spreadsheet> {
 
     DoShowFunctions(Spreadsheet receiver) {
         super(Label.SEARCH_FUNCTIONS, receiver);
-        // FIXME add fields
+        addStringField("function", Prompt.searchFunction());
     }
 
     @Override
     protected final void execute() {
-        // FIXME implement command
+        SearchVisitor v = new SearchFunctionName(stringField("function"));
+        _receiver.searchStore(v).forEach(str -> _display.popup(str));
     }
 
 }

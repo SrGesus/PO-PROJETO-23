@@ -4,14 +4,25 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
+import java.lang.Iterable;
+import java.util.Iterator;
+import java.util.List;
 
+import xxl.cell.Address;
 import xxl.cell.Cell;
 import xxl.cell.CellStore;
 import xxl.cell.CellStoreArray;
 import xxl.cell.range.Range;
+import xxl.content.CellReference;
+import xxl.content.Content;
+import xxl.content.literal.ErrorLiteral;
+import xxl.content.literal.IntLiteral;
+import xxl.content.literal.StringLiteral;
 import xxl.exceptions.*;
+import xxl.function.*;
 import xxl.user.DataStore;
 import xxl.user.User;
+import xxl.visitor.SearchVisitor;
 
 /**
  * Class representing a spreadsheet.
@@ -23,6 +34,8 @@ public class Spreadsheet implements Serializable {
 
     /** Flexible storage for Cells */
     private CellStore _cellStore;
+
+    private CellStore _cutBuffer = new CellStoreArray(0, 0);
 
     /** Set of user names */
     private Set<String> _users = null;
@@ -65,21 +78,78 @@ public class Spreadsheet implements Serializable {
     }
 
     /**
-     * @param addressExpression ::= LINHA;COLUNA
-     * @return the Cell
-     * @throws InvalidAddressException when not able to parse address.
+     * Searches the store for matching Cells
+     * @param v search visitor
+     * @return list of results
      */
-    public Cell getCell(String addressExpression) throws InvalidAddressException {
-        return _cellStore.getCell(addressExpression);
+    public List<String> searchStore(SearchVisitor v) {
+        return _cellStore.searchStore(v);
     }
 
     /**
-     * @param rangeSpecification ::= LINHA;COLUNA:LINHA;COLUNA | LINHA;COLUNA
-     * @return an iterator over the cells in the specified range.
+     * Parses an expression String into a Content.
+     * @param expression
+     * @param checkEqual whether to check for an equals sign at the beginning of the expression
+     * @return
+     * @throws FunctionNameException
+     */
+    public Content parseContent(String expression, boolean checkEqual) throws FunctionNameException {
+        if (expression.isBlank()) return null;
+        /* Try String */
+        try {
+            return new StringLiteral(expression);
+        } catch (InvalidExpressionException e) {}
+        /* Try Int */
+        try {
+            return new IntLiteral(expression);
+        } catch (InvalidExpressionException e) {}
+        /* Consume equals */
+        if (checkEqual) {
+            if (expression.charAt(0) != '=') return new ErrorLiteral();
+            expression = expression.substring(1);
+        }
+        /* Try reference to Cell */
+        try {
+            return new CellReference(_cellStore, expression);
+        } catch (InvalidExpressionException e) {}
+        /* Try function */
+        try {
+            /** The name of the function is everything until '(' */
+            String functionName = expression.substring(0, expression.indexOf('('));
+            /** Array of what is inbetween commas and inside the outermost parentheses */
+            String[] functionArgs = expression.substring(expression.indexOf('(')+1, expression.lastIndexOf(')')).split(",+(?![^\\(]*\\))");
+            return switch(functionName) {
+                case "ADD" -> new ADD(this, functionArgs);
+                case "DIV" -> new DIV(this, functionArgs);
+                case "MUL" -> new MUL(this, functionArgs);
+                case "SUB" -> new SUB(this, functionArgs);
+                case "AVERAGE" -> new AVERAGE(this, functionArgs);
+                case "PRODUCT" -> new PRODUCT(this, functionArgs);
+                case "CONCAT" -> new CONCAT(this, functionArgs);
+                case "COALESCE" -> new COALESCE(this, functionArgs);
+                default -> throw new FunctionNameException(functionName);
+            };
+        } catch (IndexOutOfBoundsException| FunctionArgException e) {}
+        return new ErrorLiteral();
+    }
+
+    
+    /**
+     * getRange but works for single cells.
+     * @param gamaSpecification ::= LINHA;COLUNA:LINHA;COLUNA | LINHA;COLUNA
+     * @return the Range of the given specification.
      * @throws InvalidRangeException
      */
-    public Range getGama(String rangeSpecification) throws InvalidRangeException {
-        return _cellStore.getGama(rangeSpecification);
+    public Range getGama(String gamaSpecification) throws InvalidRangeException {
+        try {
+            return _cellStore.getRange(gamaSpecification);
+        } catch (InvalidRangeException e) {
+            try {
+                return _cellStore.getRange(gamaSpecification + ":" + gamaSpecification);
+            } catch (InvalidRangeException e2) {
+                throw e;
+            }
+        }
     }
 
     /**
@@ -92,19 +162,56 @@ public class Spreadsheet implements Serializable {
     }
 
     /**
+     * @return 
+     * @throws InvalidRangeException
+     */
+    public Iterable<String> showCutBuffer() throws InvalidRangeException {
+        return getCutBufferRange().iterStrings();
+    }
+
+    /**
+     * Deletes the contents of the given gama.
+     * @param rangeSpecification
+     * @throws InvalidRangeException
+     */
+    public void deleteGama(String rangeSpecification) throws InvalidRangeException {
+        getGama(rangeSpecification).iterAddresses().forEach(addr -> {
+            try {_cellStore.deleteCell(addr);
+            } catch (InvalidAddressException e) { /* Logically Unreachable */}
+        } );
+        dirty();
+    }
+
+    /**
+     * Inserts content into gama.
+     * @param gamaSpecification
+     */
+    public void insertGama(String gamaSpecification, String contentSpecification) throws InvalidExpressionException, FunctionNameException {
+        Content content = parseContent(contentSpecification, true);
+        getGama(gamaSpecification).iterAddresses().forEach(addr -> {
+            try {_cellStore.getCell(addr).setContent(content);
+            } catch (InvalidAddressException e) { /* Logically Unreachable */}
+        } );
+        dirty();
+    }
+
+    /**
      * Insert specified content in specified range.
-     * @param rangeSpecification ::= LINHA;COLUNA:LINHA;COLUNA | LINHA;COLUNA
+     * @param gamaSpecification ::= LINHA;COLUNA:LINHA;COLUNA | LINHA;COLUNA
      * @param contentSpecification an expression
      */
-    public void insertContents(String rangeSpecification, String contentSpecification) throws UnrecognizedEntryException, FunctionNameException {
+    public void insertContents(String gamaSpecification, String contentSpecification) throws UnrecognizedEntryException {
         try {
             if (contentSpecification.isBlank())
-                _cellStore.deleteGama(rangeSpecification);
-            else
-                _cellStore.insertExpression(rangeSpecification, contentSpecification);
+                deleteGama(gamaSpecification);
+            else 
+                insertGama(gamaSpecification, contentSpecification);
             dirty();
         } catch (InvalidExpressionException e) {
             throw new UnrecognizedEntryException(e.getExpression());
+        } catch (FunctionNameException e) {
+            /* Guaranteed to be Unreachable */
+            throw new UnrecognizedEntryException(contentSpecification);
         }
     }
 
@@ -125,5 +232,68 @@ public class Spreadsheet implements Serializable {
     public void rename(DataStore store, String filename) {
         store.renameSpreadsheet(_filename, filename);
         _filename = filename;
+    }
+
+    private Range getCutBufferRange() {
+        try {
+            return _cutBuffer.getRange("1;1:" + _cutBuffer.getLines() + ";" + _cutBuffer.getColumns());
+        } catch (InvalidRangeException e) {
+            /* Logically Unreachable */
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * Cuts the content of the target cells into the cut buffer.
+     * @param gamaSpecification ::= LINHA;COLUNA:LINHA;COLUNA | LINHA;COLUNA
+     */
+    public void cut(String gamaSpecification) throws InvalidRangeException {
+        copy(gamaSpecification);
+        deleteGama(gamaSpecification);
+    }
+
+    /**
+     * Copies the content of the target cells into the cut buffer.
+     * @param gamaSpecification ::= LINHA;COLUNA:LINHA;COLUNA | LINHA;COLUNA
+     */
+    public void copy(String gamaSpecification) throws InvalidRangeException {
+        Range gamaOrigem = getGama(gamaSpecification);
+        _cutBuffer = new CellStoreArray(gamaOrigem.getLines(), gamaOrigem.getColumns());
+        Iterator<Cell> originIterator = gamaOrigem.iterCellsReadOnly().iterator();
+        Iterator<Cell> cutBufferIterator = getCutBufferRange().iterCells().iterator();
+        while (cutBufferIterator.hasNext() && originIterator.hasNext()) {
+            Cell bufferCell = cutBufferIterator.next();
+            bufferCell.paste(this, originIterator.next()).close();
+            bufferCell.value(); // Update value
+        }
+    }
+
+    /**
+     * Pastes the cut buffer content into the target cells.
+     * @param gamaSpecification ::= LINHA;COLUNA:LINHA;COLUNA | LINHA;COLUNA
+     */
+    public void paste(String gamaSpecification) throws InvalidRangeException {
+        Range gamaDestino = getGama(gamaSpecification);
+        // Get all of the cut buffer
+        Range gamaCutBuffer = _cutBuffer.getRange("1;1:" + _cutBuffer.getLines() + ";" + _cutBuffer.getColumns());
+        // If provided range is single cell
+        if (gamaDestino.getColumns() == 1 && gamaDestino.getLines() == 1) {
+            Address cellAddr = gamaDestino.getStartAddress();
+            // If buffer is horizontal
+            if (gamaCutBuffer.getColumns() > 1)
+                gamaDestino = getGama(cellAddr + ":" + (cellAddr.getLine() + 1) + ";" + _cellStore.getColumns());
+            // If buffer is vertical
+            else
+                gamaDestino = getGama(cellAddr + ":" + _cellStore.getLines() + ";" + (cellAddr.getColumn() + 1));
+        // otherwise if geometry does not match
+        } else if (gamaDestino.getColumns() != gamaCutBuffer.getColumns() && gamaDestino.getLines() != gamaCutBuffer.getLines())
+            throw new InvalidRangeException(gamaSpecification);
+        Iterator<Cell> destinationIterator = gamaDestino.iterCells().iterator();
+        Iterator<Cell> cutBufferIterator = gamaCutBuffer.iterCellsReadOnly().iterator();
+        // While there are cells and space to paste
+        while (destinationIterator.hasNext() && cutBufferIterator.hasNext())
+            destinationIterator.next().paste(this, cutBufferIterator.next());
+        dirty();
     }
 }
