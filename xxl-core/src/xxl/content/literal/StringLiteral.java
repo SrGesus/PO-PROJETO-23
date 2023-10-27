@@ -31,11 +31,6 @@ public class StringLiteral extends Literal {
         return _value;
     }
 
-    @Override
-    public String toString() {
-        return "'" + _value;
-    }
-
     /** @see Visitable#accept(Visitor) */
     public <T> T accept(Visitor<T> visitor) {
         return visitor.visitStringLiteral(this);

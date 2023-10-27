@@ -1,11 +1,15 @@
 package xxl.function;
 
+import java.util.List;
+
 import xxl.Spreadsheet;
+import xxl.content.Content;
 import xxl.content.literal.IntLiteral;
 import xxl.content.literal.Literal;
 import xxl.exceptions.InvalidExpressionException;
 import xxl.exceptions.FunctionArgException;
 import xxl.exceptions.UnexpectedContentException;
+import xxl.visitor.Visitable;
 import xxl.visitor.Visitor;
 
 public class AVERAGE extends RangeFunction {
@@ -20,6 +24,13 @@ public class AVERAGE extends RangeFunction {
         super(spreadsheet, args);
     }
 
+    /**
+     * Constructor from Content.
+     * @param args
+     */
+    public AVERAGE(List<Content> args) {
+        super(args);
+    }
 
     /**
      * @return the result of the function
@@ -32,16 +43,6 @@ public class AVERAGE extends RangeFunction {
             result += getArg(i).getInt();
         }
         return new IntLiteral(result / size()); 
-    }
-
-
-    /**
-     * @return the name of the function
-     * @see Function#getName()
-     */
-    @Override
-    public String getName() {
-        return "AVERAGE";
     }
 
     /** @see Visitable#accept(Visitor) */

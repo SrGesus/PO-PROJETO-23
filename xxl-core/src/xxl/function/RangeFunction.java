@@ -1,5 +1,7 @@
 package xxl.function;
 
+import java.util.List;
+
 import xxl.Spreadsheet;
 import xxl.content.Content;
 import xxl.content.literal.ErrorLiteral;
@@ -12,7 +14,7 @@ import xxl.exceptions.InvalidRangeException;
 public abstract class RangeFunction extends Function{
 
     /**
-     * Constructor.
+     * Constructor from String.
      * @param spreadsheet
      * @param args
      * @throws FunctionArgException
@@ -24,6 +26,14 @@ public abstract class RangeFunction extends Function{
         } catch (InvalidRangeException e) {
             throw new FunctionArgException(); 
         }
+    }
+
+    /**
+     * Constructor from Content.
+     * @param args
+     */
+    protected RangeFunction(List<Content> args) {
+        super(args);
     }
 
     /**
@@ -44,12 +54,6 @@ public abstract class RangeFunction extends Function{
      * @return result of the function
      */
     protected abstract Literal result() throws UnexpectedContentException, InvalidExpressionException;
-    
 
-    /** @see Content#toString() */
-    @Override
-    public String toString() {
-        return getName() + "(" + getArg(0) + ":" + getArg(size()-1) + ")";
-    }  
 }
 

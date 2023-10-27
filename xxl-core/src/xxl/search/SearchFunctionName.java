@@ -1,14 +1,29 @@
-package xxl.visitor;
+package xxl.search;
+
+import java.util.Comparator;
 
 import xxl.cell.Cell;
 import xxl.content.*;
 import xxl.content.literal.*;
 import xxl.function.*;
+import xxl.visitor.ExpressionGenerator;
 
-public class SearchFunctionName implements SearchVisitor {
+public class SearchFunctionName implements SearchMethod {
   
   /* Pattern to match in function name */
   private String _name;
+
+  /** Compares by Address */
+  private static Comparator<SearchResult> BY_ADDRESS = new Comparator<SearchResult>() {
+    public int compare(SearchResult o1, SearchResult o2) {
+      int value = o1.getCell().accept(new ExpressionGenerator()).split("=")[1].split("\\(")[0]
+        .compareTo(o2.getCell().accept(new ExpressionGenerator()).split("=")[1].split("\\(")[0]);
+      if (value == 0)
+        return o1.getAddress().compareTo(o2.getAddress());
+      else
+        return value;
+    }
+  };
 
   /**
    * Constructor.
@@ -17,6 +32,10 @@ public class SearchFunctionName implements SearchVisitor {
   public SearchFunctionName(String name) {
     _name = name;
   }
+
+  public Comparator<SearchResult> getComparator() {
+    return BY_ADDRESS;
+  }  
 
   public Boolean visitCell(Cell c) {
     return c.getContent().accept(this);

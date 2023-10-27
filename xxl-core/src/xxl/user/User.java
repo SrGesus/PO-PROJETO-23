@@ -1,7 +1,8 @@
 package xxl.user;
 
 import java.io.Serializable;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Represents an user of the Calculator.
@@ -12,14 +13,18 @@ public class User implements Serializable {
     private String _name;
 
     /** List of Spreadsheet's filenames */
-    private List<String> _spreadsheets;
+    private Set<String> _spreadsheets = new HashSet<>(1);
 
     /**
      * Constructor.
      * @param name of the user
      */
-    User(String name) {
+    public User(String name) {
         _name = name;
+    }
+
+    Set<String> getSpreadsheets() {
+        return _spreadsheets;
     }
 
     /**
@@ -27,7 +32,6 @@ public class User implements Serializable {
      * @param filename
      */
     public void addSpreadsheet(String filename) {
-        if (filename == null) return;
         _spreadsheets.add(filename);
     }
 
@@ -36,18 +40,7 @@ public class User implements Serializable {
      * @param filename
      */
     public void removeSpreadsheet(String filename) {
-        if (filename == null) return;
         _spreadsheets.remove(filename);
-    }
-
-    /**
-     * Replaces name of a spreadsheet.
-     * @param oldFilename
-     * @param newFilename
-     */
-    public void renameSpreadsheet(String oldFilename, String newFilename) {
-        removeSpreadsheet(oldFilename);
-        addSpreadsheet(newFilename);
     }
 
     /**
@@ -55,5 +48,20 @@ public class User implements Serializable {
      */
     public String getName() {
         return _name;
+    }
+
+    /** @see Object#hashCode() */
+    @Override
+    public int hashCode() {
+        return getName().hashCode();
+    }
+
+    /** @see Object#equals(Object) */
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof User user) {
+            return getName().equals(user.getName());
+        }
+        return false;
     }
 }

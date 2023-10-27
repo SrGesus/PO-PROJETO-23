@@ -1,6 +1,9 @@
 package xxl.function;
 
+import java.util.List;
+
 import xxl.Spreadsheet;
+import xxl.content.Content;
 import xxl.content.literal.StringLiteral;
 import xxl.exceptions.InvalidExpressionException;
 import xxl.exceptions.FunctionArgException;
@@ -20,6 +23,13 @@ public class COALESCE extends RangeFunction {
         super(spreadsheet, args);
     }
 
+    /**
+     * Constructor from Content.
+     * @param args
+     */
+    public COALESCE(List<Content> args) {
+        super(args);
+    }
 
     /**
      * @return the result of the function
@@ -38,16 +48,6 @@ public class COALESCE extends RangeFunction {
             }
         }
         return new StringLiteral(result);
-    }
-
- 
-    /**
-     * @return the name of the function
-     * @see Function#getName()
-     */
-    @Override
-    public String getName() {
-        return "COALESCE";
     }
 
     /** @see Visitable#accept(Visitor) */

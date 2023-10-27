@@ -4,13 +4,12 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import xxl.Spreadsheet;
 import xxl.content.Content;
 import xxl.content.literal.ErrorLiteral;
 import xxl.content.literal.Literal;
-import xxl.exceptions.FunctionNameException;
 import xxl.observer.Observable;
 import xxl.observer.Observer;
+import xxl.visitor.CopyContent;
 import xxl.visitor.Visitable;
 import xxl.visitor.Visitor;
 
@@ -58,11 +57,10 @@ public class Cell implements Serializable, Observable, Observer, Visitable {
 
     /**
      * Creates a copy of this Cell.
-     * @param spreadsheet
      * @return the Cell's copy
      */
-    public Cell copy(Spreadsheet spreadsheet) {
-        return new Cell().paste(spreadsheet, this);
+    public Cell copy() {
+        return new Cell().paste(this);
     }
 
     /**
@@ -70,13 +68,8 @@ public class Cell implements Serializable, Observable, Observer, Visitable {
      * @param origin Cell to copy from
      * @return this Cell (destination)
      */
-    public Cell paste(Spreadsheet spreadsheet, Cell origin) {
-        try {
-            setContent(spreadsheet.parseContent(origin._content != null ? origin._content.toString() : "", false));
-        } catch (FunctionNameException e) {
-            /* Logically Unreachable */
-            e.printStackTrace();
-        }
+    public Cell paste(Cell origin) {
+        setContent(origin.accept(new CopyContent()));
         return this;
     }
 
@@ -135,17 +128,6 @@ public class Cell implements Serializable, Observable, Observer, Visitable {
      */
     public boolean isLiteral() {
         return _content == value();
-    }
-
-    /** @see Object#toString() */
-    @Override
-    public String toString() {
-        if (isEmpty()) return "";
-        if (isLiteral()) {
-            return _content.toString();
-        } else {
-            return value().toString() + "=" + _content.toString();
-        }
     }
 
     /** @see Observer#close() */

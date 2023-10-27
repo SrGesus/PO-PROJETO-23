@@ -10,19 +10,34 @@ import xxl.content.Content;
 import xxl.content.ObservableContent;
 import xxl.content.literal.Literal;
 import xxl.exceptions.FunctionArgException;
-import xxl.exceptions.InvalidAddressException;
 import xxl.exceptions.UnexpectedContentException;
 import xxl.observer.Observer;
 
 public abstract class Function extends ObservableContent implements Observer {
 
     /* Whether the Literal value of this Function is up to date */
-    private boolean dirty = true;
+    private boolean _dirty = true;
 
     /* The output saved, so it doesn't have to be recalculated */
     private Literal _value;
 
     private List<Content> _arguments = new ArrayList<>();
+
+    protected Function() {}
+
+    /**
+     * Constructor from Content.
+     * @param args
+     */
+    protected Function(List<Content> args) {
+        try {
+            for (Content c : args)
+                addArg(c);
+        } catch (FunctionArgException e) {
+            /** Guaranteed to be Unreachable */
+            e.printStackTrace();
+        }
+    }
 
     /**
      * Adds a single Content as an argument of this Function.
@@ -45,7 +60,7 @@ public abstract class Function extends ObservableContent implements Observer {
             while (iterator.hasNext()) {
                 addArg(new CellReference(iterator.getCurrentAddress(), iterator.next()));
             }
-        } catch (InvalidAddressException | ClassCastException e) {
+        } catch (ClassCastException e) {
             /* Logically Unreachable */
             e.printStackTrace();
         }
@@ -88,9 +103,9 @@ public abstract class Function extends ObservableContent implements Observer {
     /** @see Content#value() */
     @Override
     public final Literal value() {
-        if (dirty) {
+        if (_dirty) {
             _value = compute();
-            dirty = false;
+            _dirty = false;
         }
         return _value;
     }
@@ -98,7 +113,7 @@ public abstract class Function extends ObservableContent implements Observer {
     /** @see Observer#update() */
     @Override
     public void update() {
-        dirty = true;
+        _dirty = true;
         notifyObservers();
     }
 
@@ -107,11 +122,6 @@ public abstract class Function extends ObservableContent implements Observer {
      * @return the Literal value of this Function as computed by a subclass.
      */
     protected abstract Literal compute();
-
-    /**
-     * @return the name of this Function.
-     */
-    public abstract String getName();
 
     /** @see Observer#close() */
     @Override

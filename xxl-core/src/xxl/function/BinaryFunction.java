@@ -1,5 +1,7 @@
 package xxl.function;
 
+import java.util.Arrays;
+
 import xxl.Spreadsheet;
 import xxl.content.Content;
 import xxl.content.literal.ErrorLiteral;
@@ -12,7 +14,7 @@ import xxl.exceptions.UnexpectedContentException;
 public abstract class BinaryFunction extends Function {
 
     /**
-     * Constructor.
+     * Constructor from Strings.
      * @param spreadsheet
      * @param args
      * @throws FunctionArgException
@@ -26,6 +28,14 @@ public abstract class BinaryFunction extends Function {
         } catch (FunctionNameException e) {
             throw new FunctionArgException();
         }
+    }
+
+    /**
+     * Constructor from Content.
+     * @param ...args
+     */
+    protected BinaryFunction(Content... args) {
+        super(Arrays.asList(args));
     }
     
     /**
@@ -49,9 +59,4 @@ public abstract class BinaryFunction extends Function {
      */
     protected abstract int result(int x, int y) ;
 
-    /** @see Content#toString() */
-    @Override
-    public String toString() {
-        return getName() + "(" + getArg(0) + "," + getArg(1) + ")";
-    }
 }
