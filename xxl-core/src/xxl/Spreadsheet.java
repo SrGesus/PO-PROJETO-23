@@ -156,7 +156,7 @@ public class Spreadsheet implements Serializable {
     }
 
     /**
-     * getRange but works for single cells.
+     * Like getRange but works for single cells.
      * @param gamaSpecification ::= LINHA;COLUNA:LINHA;COLUNA | LINHA;COLUNA
      * @return the Range of the given specification.
      * @throws InvalidRangeException

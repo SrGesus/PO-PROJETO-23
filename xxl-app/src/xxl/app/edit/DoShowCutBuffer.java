@@ -20,7 +20,7 @@ class DoShowCutBuffer extends Command<Spreadsheet> {
     protected final void execute() throws CommandException {
         try {
             _receiver.showCutBuffer().forEach(str -> _display.popup(str));
-        } catch (InvalidRangeException e) { // FIXME add proper exception
+        } catch (InvalidRangeException e) {
             throw new InvalidCellRangeException(e.getExpression());
         }
     }
