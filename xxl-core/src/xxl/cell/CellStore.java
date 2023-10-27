@@ -88,8 +88,8 @@ public abstract class CellStore implements Serializable {
 
     /**
      * Efficiently iterate over taking advantage of the store type.
+     * <p> Note: Only guaranteed to be in-order for CellStoreArray.
      * @param consumer consumer of Address and Cell
-     * @note Only guaranteed to be in-order for CellStoreArray
      */
     public abstract void forEach(Consumer<SearchResult> consumer);
 

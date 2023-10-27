@@ -6,10 +6,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.lang.Iterable;
 import java.util.List;
-import java.util.Comparator;
-import java.util.Collections;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import xxl.cell.Address;
 import xxl.cell.CellStore;
@@ -18,15 +14,12 @@ import xxl.cell.CutBuffer;
 import xxl.cell.range.Range;
 import xxl.content.CellReference;
 import xxl.content.Content;
-import xxl.content.literal.ErrorLiteral;
-import xxl.content.literal.IntLiteral;
-import xxl.content.literal.StringLiteral;
+import xxl.content.literal.*;
 import xxl.exceptions.*;
 import xxl.function.*;
 import xxl.search.SearchResult;
 import xxl.search.SearchMethod;
 import xxl.search.Searcher;
-import xxl.user.DataStore;
 import xxl.user.User;
 
 /**
@@ -40,13 +33,14 @@ public class Spreadsheet implements Serializable {
     /** Flexible storage for Cells */
     private CellStore _cellStore;
 
+    /** CutBuffer */
     private CutBuffer _cutBuffer = new CutBuffer();
 
-    /** Set of user names */
-    private Set<String> _users = null;
+    /** Name of the Spreadsheet */
+    private String _filename = "";
 
-    /** */
-    private String _filename = null;
+    /** Set of user names */
+    private Set<User> _users = null;
 
     /** Whether there are unsaved changes */
     private boolean _dirty = true;
@@ -59,7 +53,9 @@ public class Spreadsheet implements Serializable {
     Spreadsheet(int lines, int columns) {
         _cellStore = new CellStoreArray(lines, columns);
     }
-    
+
+//  Files
+
     /**
      * THere are unsaved changes.
      */
@@ -83,6 +79,25 @@ public class Spreadsheet implements Serializable {
     }
 
     /**
+     * @return the name of the Spreadsheet file
+     */
+    public String getFilename() {
+        return _filename;
+    }
+
+    /**
+     * Changes the Spreadsheet file name.
+     * <p> Note: Does not handle users.
+     * @param filename
+     * @see DataStore#renameSpreadsheet(String,String)
+     */
+    public void setFilename(String filename) {
+        _filename = filename;
+    }
+
+//  Search
+
+    /**
      * Searches the store for matching Cells
      * @param v search visitor
      * @return list of results, with functions alphabetically sorted
@@ -90,6 +105,8 @@ public class Spreadsheet implements Serializable {
     public List<SearchResult> searchStore(SearchMethod v) {
         return new Searcher(v).search(_cellStore);
     }
+
+//  Edit
 
     /**
      * Parses an expression String into a Content.
@@ -149,8 +166,8 @@ public class Spreadsheet implements Serializable {
         String[] range = gamaSpecification.split(":");
         try {
             return switch (range.length) {
-                case 1 -> _cellStore.getRange(new Address(range[0]), new Address(range[0]));
-                case 2 -> _cellStore.getRange(new Address(range[0]), new Address(range[1]));
+                case 1  -> _cellStore.getRange(new Address(range[0]), new Address(range[0]));
+                case 2  -> _cellStore.getRange(new Address(range[0]), new Address(range[1]));
                 default -> throw new InvalidRangeException(gamaSpecification);
             };
         } catch (InvalidAddressException e) {
@@ -214,17 +231,40 @@ public class Spreadsheet implements Serializable {
         }
     }
 
+//  Users
+
     /**
-     * Add given user to the spreadsheet.
+     * Package-Private iterable for users.
+     * @return users of the Spreadsheet
      */
-    public void addUser(User user) {
-        if (_users == null) _users = new HashSet<String>();
-        _users.add(user.getName());
-        user.addSpreadsheet(_filename);
-        dirty();
+    Iterable<User> users() {
+        return _users;
     }
 
-//   Cut Buffer Apparattus
+    /**
+     * Add given user to the spreadsheet.
+     * Overwrites if user already exists.
+     * @param user to be added
+     */
+    public void addUser(User user) {
+        if (_users == null) _users = new HashSet<User>();
+        if (_users.add(user))
+            dirty();
+        else
+            /** Update User */
+            _users.remove(user); _users.add(user);
+    }
+
+    /**
+     * Remove given user from the spreadsheet.
+     * @param user to be removed
+     */
+    void removeUser(User user) {
+        if (_users == null) return;
+        _users.remove(user);
+    }
+
+//  Cut Buffer Apparatus
 
     /**
      * Cuts the content of the target cells into the cut buffer.

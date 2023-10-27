@@ -13,14 +13,18 @@ public class User implements Serializable {
     private String _name;
 
     /** List of Spreadsheet's filenames */
-    private Set<String> _spreadsheets = new HashSet<>();
+    private Set<String> _spreadsheets = new HashSet<>(1);
 
     /**
      * Constructor.
      * @param name of the user
      */
-    User(String name) {
+    public User(String name) {
         _name = name;
+    }
+
+    Set<String> getSpreadsheets() {
+        return _spreadsheets;
     }
 
     /**
@@ -28,7 +32,6 @@ public class User implements Serializable {
      * @param filename
      */
     public void addSpreadsheet(String filename) {
-        if (filename == null) return;
         _spreadsheets.add(filename);
     }
 
@@ -37,7 +40,6 @@ public class User implements Serializable {
      * @param filename
      */
     public void removeSpreadsheet(String filename) {
-        if (filename == null) return;
         _spreadsheets.remove(filename);
     }
 
@@ -52,5 +54,14 @@ public class User implements Serializable {
     @Override
     public int hashCode() {
         return getName().hashCode();
+    }
+
+    /** @see Object#equals(Object) */
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof User user) {
+            return getName().equals(user.getName());
+        }
+        return false;
     }
 }

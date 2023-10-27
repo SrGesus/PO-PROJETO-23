@@ -1,7 +1,5 @@
 package xxl.search;
 
-import java.util.Comparator;
-
 import xxl.cell.Address;
 import xxl.cell.Cell;
 import xxl.visitor.ExpressionGenerator;
@@ -9,7 +7,7 @@ import xxl.visitor.ExpressionGenerator;
 public class SearchResult {
     
     private Address _address;
-    
+
     private Cell _cell;
 
     public SearchResult(Address address, Cell cell) {

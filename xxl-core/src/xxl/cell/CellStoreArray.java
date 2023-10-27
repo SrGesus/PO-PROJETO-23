@@ -68,7 +68,6 @@ public class CellStoreArray extends CellStore {
     /**
      * Efficiently iterate over taking advantage of the store type.
      * @param consumer consumer of Address and Cell
-     * @note Only guaranteed to be in-order for CellStoreArray
      * @see CellStore#forEach(java.util.function.Consumer)
      */
     @Override

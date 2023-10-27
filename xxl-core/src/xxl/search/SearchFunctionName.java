@@ -16,12 +16,12 @@ public class SearchFunctionName implements SearchMethod {
   /** Compares by Address */
   private static Comparator<SearchResult> BY_ADDRESS = new Comparator<SearchResult>() {
     public int compare(SearchResult o1, SearchResult o2) {
-        int value = o1.getCell().accept(new ExpressionGenerator()).split("=")[1].split("\\(")[0]
-         .compareTo(o2.getCell().accept(new ExpressionGenerator()).split("=")[1].split("\\(")[0]);
-        if (value == 0)
-          return o1.getAddress().compareTo(o2.getAddress());
-        else
-          return value;
+      int value = o1.getCell().accept(new ExpressionGenerator()).split("=")[1].split("\\(")[0]
+        .compareTo(o2.getCell().accept(new ExpressionGenerator()).split("=")[1].split("\\(")[0]);
+      if (value == 0)
+        return o1.getAddress().compareTo(o2.getAddress());
+      else
+        return value;
     }
   };
 
