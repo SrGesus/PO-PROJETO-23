@@ -43,6 +43,9 @@ public class Cell implements Serializable, Observable, Observer, Visitable {
         notifyObservers();
     }
 
+    /**
+     * @return content of the cell
+     */
     public Content getContent() {
         return _content;
     }

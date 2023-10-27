@@ -78,6 +78,7 @@ public class CellStoreArray extends CellStore {
             for (int j = 0; j < getColumns(); j++) {
                 Cell cell = line[j];
                 if (cell == null) continue;
+                if (cell.isEmpty()) continue;
                 consumer.accept(new SearchResult(new Address(i, j), cell));
             }
         }

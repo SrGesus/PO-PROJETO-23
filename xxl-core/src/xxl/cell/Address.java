@@ -76,6 +76,7 @@ public class Address implements Serializable, Comparable<Address> {
         _column = column;
     }
 
+    /** @see Comparable#compareTo(Object) */
     public int compareTo(Address addr) {
         if (getLine() - addr.getLine() == 0) {
             return getColumn() - addr.getColumn();
