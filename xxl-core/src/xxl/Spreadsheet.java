@@ -23,7 +23,9 @@ import xxl.content.literal.IntLiteral;
 import xxl.content.literal.StringLiteral;
 import xxl.exceptions.*;
 import xxl.function.*;
-import xxl.search.SearchVisitor;
+import xxl.search.SearchResult;
+import xxl.search.SearchMethod;
+import xxl.search.Searcher;
 import xxl.user.DataStore;
 import xxl.user.User;
 
@@ -85,33 +87,8 @@ public class Spreadsheet implements Serializable {
      * @param v search visitor
      * @return list of results, with functions alphabetically sorted
      */
-    public List<String> searchStore(SearchVisitor v) {
-        List<String> result = _cellStore.searchStore(v);
-        
-        Comparator<String> functionSorter = new Comparator<String>() {
-            @Override
-            public int compare(String s1, String s2) {
-                // Find the substrings after the '=' character
-                String pattern = "=(.*?)(\\()";
-                Pattern r = Pattern.compile(pattern);
-
-                Matcher m1 = r.matcher(s1);
-                Matcher m2 = r.matcher(s2);
-
-                if (m1.find() && m2.find()) {
-                    String substring1 = m1.group(1);
-                    String substring2 = m2.group(1);
-
-                    return substring1.compareTo(substring2);
-                } else {
-                    // If no match is found, behave as if no comparison is needed
-                    return s1.compareTo(s2);
-                }
-            }
-        };
-
-        Collections.sort(result, functionSorter); // Sort the results based on function name alphabetical order
-        return result;
+    public List<SearchResult> searchStore(SearchMethod v) {
+        return new Searcher(v).search(_cellStore);
     }
 
     /**

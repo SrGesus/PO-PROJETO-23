@@ -7,7 +7,7 @@ import xxl.exceptions.InvalidAddressException;
 /**
  * Represents an address in the spreadsheet that corresponds to a single cell.
  */
-public class Address implements Serializable {
+public class Address implements Serializable, Comparable<Address> {
     /** The line of this address */
     private int _line;
 
@@ -74,6 +74,14 @@ public class Address implements Serializable {
      */
     void setColumn(int column) {
         _column = column;
+    }
+
+    public int compareTo(Address addr) {
+        if (getLine() - addr.getLine() == 0) {
+            return getColumn() - addr.getColumn();
+        } else {
+            return getLine() - addr.getLine();
+        }
     }
 
     /** @see Object#toString() */

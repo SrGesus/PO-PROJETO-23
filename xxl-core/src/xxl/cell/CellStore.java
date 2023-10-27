@@ -1,12 +1,12 @@
 package xxl.cell;
 
 import java.io.Serializable;
-import java.util.List;
+import java.util.function.Consumer;
 
 import xxl.cell.range.Range;
 import xxl.exceptions.InvalidAddressException;
 import xxl.exceptions.InvalidRangeException;
-import xxl.search.SearchVisitor;
+import xxl.search.SearchResult;
 
 /**
  * Class that stores all Cells of a Spreadsheet.
@@ -87,11 +87,11 @@ public abstract class CellStore implements Serializable {
     }
 
     /**
-     * Searches the store for matching Cells
-     * @param v search visitor
-     * @return list of results
+     * Efficiently iterate over taking advantage of the store type.
+     * @param consumer consumer of Address and Cell
+     * @note Only guaranteed to be in-order for CellStoreArray
      */
-    public abstract List<String> searchStore(SearchVisitor v);
+    public abstract void forEach(Consumer<SearchResult> consumer);
 
     /**
      * Cleans up memory before saving

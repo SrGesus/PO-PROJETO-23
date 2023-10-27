@@ -1,5 +1,7 @@
 package xxl.search;
 
+import java.util.Comparator;
+
 import xxl.Spreadsheet;
 import xxl.cell.Cell;
 import xxl.content.*;
@@ -8,10 +10,17 @@ import xxl.exceptions.FunctionNameException;
 import xxl.exceptions.UnexpectedContentException;
 import xxl.function.*;
 
-public class SearchValue implements SearchVisitor {
+public class SearchValue implements SearchMethod {
   
   /* Value to be matched */
   private Content _value;
+
+  /** Compares by Address */
+  private static Comparator<SearchResult> BY_ADDRESS = new Comparator<SearchResult>() {
+    public int compare(SearchResult o1, SearchResult o2) {
+        return o1.getAddress().compareTo(o2.getAddress());
+    }
+  };
 
   /**
    * Constructor.
@@ -25,6 +34,10 @@ public class SearchValue implements SearchVisitor {
         e.printStackTrace();
     }
   }
+
+  public Comparator<SearchResult> getComparator() {
+    return BY_ADDRESS;
+  }  
 
   public Boolean visitCell(Cell c) {
     return c.value().accept(this);

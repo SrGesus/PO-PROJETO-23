@@ -1,11 +1,9 @@
 package xxl.cell;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.function.Consumer;
 
 import xxl.exceptions.InvalidAddressException;
-import xxl.search.SearchVisitor;
-import xxl.visitor.ExpressionGenerator;
+import xxl.search.SearchResult;
 
 /**
  * Class that stores all Cells of a Spreadsheet in a primitive array.
@@ -66,21 +64,24 @@ public class CellStoreArray extends CellStore {
         }
     }
 
+
+    /**
+     * Efficiently iterate over taking advantage of the store type.
+     * @param consumer consumer of Address and Cell
+     * @note Only guaranteed to be in-order for CellStoreArray
+     * @see CellStore#forEach(java.util.function.Consumer)
+     */
     @Override
-    public List<String> searchStore(SearchVisitor v) {
-        ExpressionGenerator stringifier = new ExpressionGenerator();
-        List<String> results = new ArrayList<>();
+    public void forEach(Consumer<SearchResult> consumer) {
         for (int i = 0; i < getLines(); i++) {
             Cell[] line = _cells[i];
             if (line == null) continue;
             for (int j = 0; j < getColumns(); j++) {
                 Cell cell = line[j];
                 if (cell == null) continue;
-                if (cell.accept(v))
-                    results.add(new Address(i, j).toString() + "|" + cell.accept(stringifier));
+                consumer.accept(new SearchResult(new Address(i, j), cell));
             }
         }
-        return results;
     }
 
     /**
